@@ -1,26 +1,100 @@
 import pygame 
 
 from settings import *
-from .sprites import Sprite
+from .sprites import Sprite, MovingSprite
+from .player import Player
 
 class PlatformLevel:
 	def __init__(self, tmx_map, level_frames):
 		self.display_surface = pygame.display.get_surface()
 		self.level_frames = level_frames
+		self.back_tracking = False
 
 		# groups 
-		self.all_sprites = pygame.sprite.Group()
+		self.level_sprites = pygame.sprite.Group() # TODO whatever parts remain consistent between switch if any
+		self.initial_sprites = pygame.sprite.Group()
+		self.backtrack_sprites = pygame.sprite.Group()
+
+		# TODO will need to track initial and backtrack collision sprites
+		self.collision_sprites = pygame.sprite.Group()
+		self.semi_collision_sprites = pygame.sprite.Group()
 		
 		self.setup(tmx_map)
+	
+	def __setup_tiles(self, tmx_map):# tiles 
+		for layer in ['Terrain']:
+			for x, y, surf in tmx_map.get_layer_by_name(layer).tiles():
+				groups = [self.collision_sprites]
+				if layer == 'Terrain': groups.append(self.initial_sprites)
+				match layer:
+					case 'BG': z = Z_LAYERS['bg tiles']
+					case 'FG': z = Z_LAYERS['bg tiles']
+					case _: z = Z_LAYERS['main']
+
+				Sprite((x * TILE_SIZE,y * TILE_SIZE), surf, groups, z)
+
+	def __setup_player(self, tmx_map):
+		for obj in tmx_map.get_layer_by_name('Objects'):
+			if obj.name == 'player':
+				Player((obj.x, obj.y), self.level_sprites, self.collision_sprites, self.semi_collision_sprites, obj.image)
+
+	def __setup_static_objects(self, tmx_map):
+		# TODO what kind of objects..?
+		for obj in tmx_map.get_layer_by_name('Objects'):
+			if obj.name == 'skull':
+				Sprite((obj.x, obj.y), obj.image, self.level_sprites)
+
+	def __get_moving_obj_position_attrs(self, width, height, x, y):
+		if width > height: # horizontal
+			move_dir = 'x'
+			start_pos = (x, y + height / 2)
+			end_pos = (x + width,y + height / 2)
+		else: # vertical 
+			move_dir = 'y'
+			start_pos = (x + width / 2, y)
+			end_pos = (x + width / 2,y + height)
+
+		return move_dir, start_pos, end_pos
+
+	def __setup_moving_objects(self, tmx_map):
+		for obj in tmx_map.get_layer_by_name('Moving Objects'):
+			move_dir, start_pos, end_pos = self.__get_moving_obj_position_attrs(obj.width, obj.height, obj.x, obj.y)
+			speed = obj.properties['speed'] 
+
+			if obj.name == 'helicoptor':
+				groups = [self.initial_sprites, self.semi_collision_sprites]
+				MovingSprite(groups, start_pos, end_pos, move_dir, speed)
 
 	def setup(self, tmx_map):
-		for x, y, surf in tmx_map.get_layer_by_name('Terrain').tiles():
-			Sprite((x * TILE_SIZE,y * TILE_SIZE), surf, self.all_sprites)
-			
+		self.__setup_tiles(tmx_map)
+
+		self.__setup_static_objects(tmx_map)
+		self.__setup_moving_objects(tmx_map)
+
+		self.__setup_player(tmx_map)
+
+	def draw_sprite_images(self):
+		if self.back_tracking:
+			self.backtrack_sprites.draw(self.display_surface)
+		else:
+			self.initial_sprites.draw(self.display_surface)
+
+		self.level_sprites.draw(self.display_surface)
+
+	def update_sprites(self, dt):
+		if self.back_tracking:
+			self.backtrack_sprites.update(dt)
+		else:
+			self.initial_sprites.update(dt)
+
+		self.level_sprites.update(dt)
+
 	def run(self, dt):
-		self.all_sprites.update(dt)
+		self.update_sprites(dt)
 		self.display_surface.fill('black')
-		self.all_sprites.draw(self.display_surface)
+
+		# TODO need to know if we hit something in the level????
+		self.draw_sprite_images()
 
 class ImageLevel:
 	"""Takes a filepath to a JSON file that defines the filepath for each 

@@ -17,15 +17,10 @@ class PlatformLevel:
 		self.level_sprites = AllSprites()
 		self.collision_sprites = pygame.sprite.Group()
 		self.semi_collision_sprites = pygame.sprite.Group()
-
-		# TODO tracking level switch
-		self.on_level_component = LevelComponent.INITIAL
 		
 		self.setup(tmx_map)
 	
 	def __setup_tiles(self, tmx_map):
-		# TODO initial or backtracking custom param on tmx map obj tjen passed in to sprite class
-
 		for layer in ['Terrain', 'BG', 'FG', 'Platforms']:
 			for x, y, surf in tmx_map.get_layer_by_name(layer).tiles():
 				groups = [self.level_sprites]
@@ -38,20 +33,34 @@ class PlatformLevel:
 					case 'FG': z = Z_LAYERS['bg tiles']
 					case _: z = Z_LAYERS['main']
 
-				# TODO not always static see custom properties
-				Sprite((x * TILE_SIZE,y * TILE_SIZE), surf, groups, z, level_component=LevelComponent.BACK_TRACKING)
+				Sprite((x * TILE_SIZE,y * TILE_SIZE), surf, groups, z_layer=z)
 
 	def __setup_player(self, tmx_map):
 		for obj in tmx_map.get_layer_by_name('Objects'):
 			if obj.name == 'player':
-				self.player = Player((obj.x, obj.y), self.level_sprites, self.collision_sprites, 
-						 self.semi_collision_sprites, obj.image, LevelComponent.STATIC)
+				self.player = Player(
+					pos=(obj.x, obj.y), 
+					groups=self.level_sprites, 
+					collision_sprites=self.collision_sprites, 
+					semi_collision_sprites=self.semi_collision_sprites, 
+					surf=obj.image,
+					frames= self.level_frames['player']
+					)
 
 	def __setup_static_objects(self, tmx_map):
 		# TODO what kind of objects..?
 		for obj in tmx_map.get_layer_by_name('Objects'):
-			if obj.name == 'skull':
+			# deal with single image static objects first
+			if obj.name in ('skull'):
 				Sprite((obj.x, obj.y), obj.image, [self.level_sprites])
+
+			# TODO then deal with animated static objects
+			elif obj.name in ('small_chains'):
+				frames = self.level_frames[obj.name]
+				groups = [self.level_sprites]
+				z = Z_LAYERS['main'] if not 'bg' in obj.name else Z_LAYERS['bg details']
+				animation_speed = ANIMATION_SPEED 
+				AnimatedSprite((obj.x, obj.y), frames, groups, z_layer=z, animation_speed=animation_speed)
 
 	def __get_moving_obj_position_attrs(self, width, height, x, y):
 		if width > height: # horizontal
@@ -84,7 +93,7 @@ class PlatformLevel:
 
 	def draw_sprite_images(self):
 		# TODO backttacing or not?
-		self.level_sprites.draw(self.player.hitbox_rect.center, self.on_level_component)
+		self.level_sprites.draw(self.player.hitbox_rect.center)
 
 	def update_sprites(self, dt):
 		self.level_sprites.update(dt)

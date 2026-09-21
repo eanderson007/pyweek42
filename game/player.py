@@ -25,30 +25,19 @@ class ActiveSurface(Enum):
 		
 
 class Player(pygame.sprite.Sprite):
-	def __init__(self, pos, groups, collision_sprites, semi_collision_sprites, surf):
+	def __init__(self, pos, groups, collision_sprites, semi_collision_sprites, surf, level_component):
 		super().__init__(groups)
 		"""Requires image and rect to be defined"""
 		# TODO pass in Player frames instead??
 		self.frames_idle = get_frames_from_img(['assets', 'imgs', 'vampire1_idle.png'], 64, 0)
 		self.image = self.frames_idle[0] 
+		self.z_layer = Z_LAYERS['main'] # TODO
+		self.level_component = level_component
 		
         # rects
 		self.rect = self.image.get_frect(topleft = pos)
-		# TODO put this offset somewhere else? since img depdentant
-		# TODO can this be inflate -
-		self.hitbox_rect = self.rect.inflate(-42,-38)
-		# self.hitbox_rect = pygame.FRect(
-		# 	self.rect.left+22,
-		# 	self.rect.bottom - 52,
-		# 	20,
-		# 	32
-		# )
+		self.hitbox_rect = self.rect.inflate(-42,-38) # TODO is this img depednent
 		self.last_rect = self.hitbox_rect.copy()
-		# How the artwork sits relative to the hitbox
-		# self.sprite_offset = vector(
-		# 	self.rect.left - self.hitbox_rect.left,
-		# 	self.rect.top - self.hitbox_rect.top
-		# )
 
 		# movement 
 		self.direction = vector()
@@ -199,13 +188,11 @@ class Player(pygame.sprite.Sprite):
 		
         # update actual position after hitbox moved
 		self.rect.center = self.hitbox_rect.center
-		# self.rect.topleft = self.hitbox_rect.topleft + self.sprite_offset
 
 	def platform_move(self, dt):
 		if self.platform:
 			self.hitbox_rect.topleft += self.platform.direction * self.platform.speed * dt
 			self.rect.center = self.hitbox_rect.center
-			# self.rect.topleft = self.hitbox_rect.topleft + self.sprite_offset
 
 	def update_timers(self):
 		for timer in self.timers.values():

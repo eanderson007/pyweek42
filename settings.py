@@ -2,7 +2,8 @@ WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 700
 TILE_SIZE = 32
 ANIMATION_SPEED = 6
 TITLE = 'Borrowed Time'
- 
+
+# to control the order map layers are drawn in  
 Z_LAYERS = {
 	'bg': 0,
 	'clouds': 1,
@@ -20,4 +21,4 @@ GRAVITY = 400
 JUMP = 300
 WALL_JUMP_TIME = 400
 WALL_BLOCK_TIME = 50
-DOWN_SKIP_TIME = 250
+DOWN_SKIP_TIME = 100

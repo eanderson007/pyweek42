@@ -1,7 +1,7 @@
 import pygame 
 
 from settings import *
-from .sprites import Sprite, MovingSprite
+from .sprites import *
 from .player import Player
 from .groups import AllSprites
 
@@ -17,26 +17,35 @@ class PlatformLevel:
 		self.level_sprites = AllSprites()
 		self.collision_sprites = pygame.sprite.Group()
 		self.semi_collision_sprites = pygame.sprite.Group()
+
+		# TODO tracking level switch
+		self.on_level_component = LevelComponent.INITIAL
 		
 		self.setup(tmx_map)
 	
-	def __setup_tiles(self, tmx_map):# tiles 
+	def __setup_tiles(self, tmx_map):
 		# TODO initial or backtracking custom param on tmx map obj tjen passed in to sprite class
-		for layer in ['Terrain']:
+
+		for layer in ['Terrain', 'BG', 'FG', 'Platforms']:
 			for x, y, surf in tmx_map.get_layer_by_name(layer).tiles():
-				groups = [self.collision_sprites]
-				if layer == 'Terrain': groups.append(self.level_sprites)
+				groups = [self.level_sprites]
+
+				if layer == 'Terrain': groups.append(self.collision_sprites)
+				if layer == 'Platforms': groups.append(self.semi_collision_sprites)
+
 				match layer:
 					case 'BG': z = Z_LAYERS['bg tiles']
 					case 'FG': z = Z_LAYERS['bg tiles']
 					case _: z = Z_LAYERS['main']
 
-				Sprite((x * TILE_SIZE,y * TILE_SIZE), surf, groups, z)
+				# TODO not always static see custom properties
+				Sprite((x * TILE_SIZE,y * TILE_SIZE), surf, groups, z, level_component=LevelComponent.BACK_TRACKING)
 
 	def __setup_player(self, tmx_map):
 		for obj in tmx_map.get_layer_by_name('Objects'):
 			if obj.name == 'player':
-				self.player = Player((obj.x, obj.y), self.level_sprites, self.collision_sprites, self.semi_collision_sprites, obj.image)
+				self.player = Player((obj.x, obj.y), self.level_sprites, self.collision_sprites, 
+						 self.semi_collision_sprites, obj.image, LevelComponent.STATIC)
 
 	def __setup_static_objects(self, tmx_map):
 		# TODO what kind of objects..?
@@ -75,7 +84,7 @@ class PlatformLevel:
 
 	def draw_sprite_images(self):
 		# TODO backttacing or not?
-		self.level_sprites.draw(self.player.hitbox_rect.center)
+		self.level_sprites.draw(self.player.hitbox_rect.center, self.on_level_component)
 
 	def update_sprites(self, dt):
 		self.level_sprites.update(dt)

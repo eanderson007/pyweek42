@@ -1,18 +1,27 @@
+from enum import Enum, auto
 from pygame import sprite, Surface
 from pygame.math import Vector2 as vector
 
 from settings import * 
 
+class LevelComponent(Enum):
+	"""Tracks which sprites are which parts of the level as different 
+	parts are sjown initial versus after switches pressed"""
+	STATIC = auto()
+	INITIAL = auto()
+	BACK_TRACKING = auto()
+
+
 class Sprite(sprite.Sprite):
-	def __init__(self, pos, surf = Surface((TILE_SIZE, TILE_SIZE)), groups = None, z_layer  = Z_LAYERS['main']):
+	def __init__(self, pos, surf = Surface((TILE_SIZE, TILE_SIZE)), groups = None, 
+			  z_layer  = Z_LAYERS['main'], level_component=LevelComponent.STATIC):
 		super().__init__(groups)
 		self.image = surf 
 		self.rect = self.image.get_frect(topleft = pos)
 		self.last_rect = self.rect.copy()
 		self.z_layer = z_layer
-
-		# TODO add custom var to track whether initial or backtracking so group decices whether to draw
-
+		self.level_component = level_component
+		
 class MovingSprite(Sprite):
 	def __init__(self, groups, start_pos, end_pos, move_dir, speed, flip = False):
 		surf = Surface((60,15))

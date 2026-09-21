@@ -36,8 +36,8 @@
    </properties>
   </object>
  </objectgroup>
- <objectgroup id="3" name="Objects" visible="0">
-  <object id="4" name="player" gid="57" x="227.396" y="391.472" width="32" height="32"/>
+ <objectgroup id="3" name="Objects">
+  <object id="4" name="player" gid="57" x="226.235" y="320.678" width="32" height="32"/>
   <object id="24" name="skull" gid="68" x="526.904" y="405.973" width="64" height="64"/>
   <object id="25" name="bottle" gid="70" x="626.493" y="172.399" width="64" height="64"/>
  </objectgroup>

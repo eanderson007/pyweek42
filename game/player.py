@@ -1,24 +1,54 @@
+from enum import Enum, auto
 import pygame
 from pygame.math import Vector2 as vector
 from math import sin
 from os.path import join
 
+from .asset_handling import get_frames_from_img
 from settings import *
 from .timer import Timer
+
+
+class TimerType(Enum):
+    WALL_JUMP = auto()
+    WALL_SLIDE_BLOCK = auto()
+    DOWN_ACTION = auto()
+
+class AxisType(Enum):
+    HORIZONTAL = auto()
+    VERTICAL = auto()
+
+class ActiveSurface(Enum):
+    FLOOR = auto()
+    LEFT = auto()
+    RIGHT = auto()
 		
 
 class Player(pygame.sprite.Sprite):
 	def __init__(self, pos, groups, collision_sprites, semi_collision_sprites, surf):
 		super().__init__(groups)
 		"""Requires image and rect to be defined"""
-		# TODO dummy data
-		self.image = pygame.Surface((28,24))
-		self.image.fill('red')
+		# TODO pass in Player frames instead??
+		self.frames_idle = get_frames_from_img(['assets', 'imgs', 'vampire1_idle.png'], 64, 0)
+		self.image = self.frames_idle[0] 
 		
         # rects
 		self.rect = self.image.get_frect(topleft = pos)
-		self.last_rect = self.rect.copy()
-		self.hitbox_rect = self.rect.copy()
+		# TODO put this offset somewhere else? since img depdentant
+		# TODO can this be inflate -
+		self.hitbox_rect = self.rect.inflate(-42,-38)
+		# self.hitbox_rect = pygame.FRect(
+		# 	self.rect.left+22,
+		# 	self.rect.bottom - 52,
+		# 	20,
+		# 	32
+		# )
+		self.last_rect = self.hitbox_rect.copy()
+		# How the artwork sits relative to the hitbox
+		# self.sprite_offset = vector(
+		# 	self.rect.left - self.hitbox_rect.left,
+		# 	self.rect.top - self.hitbox_rect.top
+		# )
 
 		# movement 
 		self.direction = vector()
@@ -31,27 +61,30 @@ class Player(pygame.sprite.Sprite):
 		self.semi_collision_sprites = semi_collision_sprites
 		self.platform = None
 		self.active_surface = {
-			'floor': False,
-			'left': False,
-			'right': False
+			ActiveSurface.FLOOR: False,
+			ActiveSurface.LEFT: False,
+			ActiveSurface.RIGHT: False
         }
 		
-        # timers TODO make enum
 		self.timers = {
-			'wall jump': Timer(WALL_JUMP_TIME),
-			'wall slide block': Timer(WALL_BLOCK_TIME)
+			TimerType.WALL_JUMP: Timer(WALL_JUMP_TIME),
+			TimerType.WALL_SLIDE_BLOCK: Timer(WALL_BLOCK_TIME),
+			TimerType.DOWN_ACTION: Timer(DOWN_SKIP_TIME)
         }
 	
 	def input(self):
 		keys = pygame.key.get_pressed()
 		input_vector = vector(0,0)
 		
-        # only move horizontally like this if wall jump not active
-		if not self.timers['wall jump'].active:
+		if not self.timers[TimerType.WALL_JUMP].active:
 			if keys[pygame.K_RIGHT]:
 				input_vector.x += 1
+
 			if keys[pygame.K_LEFT]:
 				input_vector.x -= 1
+
+			if keys[pygame.K_DOWN]:
+				self.timers[TimerType.DOWN_ACTION].activate()
 			
 			self.direction.x = input_vector.normalize().x if input_vector else input_vector.x
 		
@@ -61,7 +94,7 @@ class Player(pygame.sprite.Sprite):
 	def collision(self, axis: str):
 		for sprite in self.collision_sprites:
 			if sprite.rect.colliderect(self.hitbox_rect):
-				if axis == 'horizontal':
+				if axis == AxisType.HORIZONTAL:
 					# LEFT COLLISION: Player moving left, hitting the right side of a wall
                     # Check if player's left edge crossed the wall's right edge AND was safely to the right of it last frame
 					if self.hitbox_rect.left <= sprite.rect.right and int(self.last_rect.left) >= int(sprite.last_rect.right):
@@ -91,20 +124,21 @@ class Player(pygame.sprite.Sprite):
 					self.direction.y = 0 # if any type of vertical collision reset direction y = 0
     
 	def semi_collision(self):
-		for sprite in self.semi_collision_sprites:
-			if sprite.rect.colliderect(self.hitbox_rect):
-					if self.hitbox_rect.bottom >= sprite.rect.top and int(self.last_rect.bottom) <= int(sprite.last_rect.top):
-						self.hitbox_rect.bottom = sprite.rect.top
-						if self.direction.y > 0:
-							self.direction.y = 0
+		if not self.timers[TimerType.DOWN_ACTION].active:
+			for sprite in self.semi_collision_sprites:
+				if sprite.rect.colliderect(self.hitbox_rect):
+						if self.hitbox_rect.bottom >= sprite.rect.top and int(self.last_rect.bottom) <= int(sprite.last_rect.top):
+							self.hitbox_rect.bottom = sprite.rect.top
+							if self.direction.y > 0:
+								self.direction.y = 0
 
 	def __update_surface_contact(self, floor_rect, right_rect, left_rect):
 		collide_rects = [sprite.rect for sprite in self.collision_sprites]
 		semi_collide_rect = [sprite.rect for sprite in self.semi_collision_sprites]
 		
-		self.active_surface['floor'] = True if floor_rect.collidelist(collide_rects) >= 0 or floor_rect.collidelist(semi_collide_rect) >= 0 and self.direction.y >= 0 else False
-		self.active_surface['right'] = True if right_rect.collidelist(collide_rects) >= 0 else False
-		self.active_surface['left']  = True if left_rect.collidelist(collide_rects)  >= 0 else False
+		self.active_surface[ActiveSurface.FLOOR] = True if floor_rect.collidelist(collide_rects) >= 0 or floor_rect.collidelist(semi_collide_rect) >= 0 and self.direction.y >= 0 else False
+		self.active_surface[ActiveSurface.RIGHT] = True if right_rect.collidelist(collide_rects) >= 0 else False
+		self.active_surface[ActiveSurface.LEFT]  = True if left_rect.collidelist(collide_rects)  >= 0 else False
 
 	def __update_platform_contact(self, floor_rect):
 		self.platform = None
@@ -125,11 +159,11 @@ class Player(pygame.sprite.Sprite):
 		
 	def __move_horizontal(self, dt):
 		self.hitbox_rect.x += self.direction.x * self.speed * dt
-		self.collision('horizontal') # TODO change to enum
+		self.collision(AxisType.HORIZONTAL)
 
 	def __handle_gravity(self, dt):
 		# want diff gravity if sliding on the wall
-		if not self.active_surface['floor'] and any((self.active_surface['left'], self.active_surface['right'])):
+		if not self.active_surface[ActiveSurface.FLOOR] and any((self.active_surface[ActiveSurface.LEFT], self.active_surface[ActiveSurface.RIGHT])):
 			self.direction.y = 0 
 			self.hitbox_rect.y += self.gravity / 10 * dt
 		else:
@@ -140,43 +174,45 @@ class Player(pygame.sprite.Sprite):
 
 	def __handle_jump(self, dt):
 		if self.jump:
-			if self.active_surface['floor']:
+			if self.active_surface[ActiveSurface.FLOOR]:
 				self.direction.y = -JUMP
-				self.timers['wall slide block'].activate()
+				self.timers[TimerType.WALL_SLIDE_BLOCK].activate()
 				self.rect.bottom -= 1 
 			
-			elif any((self.active_surface['left'], self.active_surface['right'])) and not self.timers['wall slide block'].active:
-				self.timers['wall jump'].activate()
+			elif any((self.active_surface[ActiveSurface.LEFT], self.active_surface[ActiveSurface.RIGHT])) and not self.timers[TimerType.WALL_SLIDE_BLOCK].active:
+				self.timers[TimerType.WALL_JUMP].activate()
 				self.direction.y = -JUMP
-				self.direction.x = 1 if self.active_surface['left'] else -1
+				self.direction.x = 1 if self.active_surface[ActiveSurface.LEFT] else -1
 			
 			self.jump = False
 
 	def __move_vertical(self, dt):
 		self.__handle_gravity(dt)
-		self.collision('vertical')
+		self.collision(AxisType.VERTICAL)
 		self.semi_collision()
 		
 		self.__handle_jump(dt) # does not change hitbox position only for next round
-    
+
 	def move(self, dt):
 		self.__move_horizontal(dt)
 		self.__move_vertical(dt)
 		
         # update actual position after hitbox moved
 		self.rect.center = self.hitbox_rect.center
+		# self.rect.topleft = self.hitbox_rect.topleft + self.sprite_offset
 
 	def platform_move(self, dt):
 		if self.platform:
-			self.rect.topleft += self.platform.direction * self.platform.speed * dt
-			self.hitbox_rect.topleft = self.rect.topleft
+			self.hitbox_rect.topleft += self.platform.direction * self.platform.speed * dt
+			self.rect.center = self.hitbox_rect.center
+			# self.rect.topleft = self.hitbox_rect.topleft + self.sprite_offset
 
 	def update_timers(self):
 		for timer in self.timers.values():
 			timer.update()
 
 	def update(self, dt):
-		self.last_rect = self.rect.copy()
+		self.last_rect = self.hitbox_rect.copy()
 		self.update_timers()
 		self.input()
 		

@@ -11,6 +11,8 @@ class Sprite(sprite.Sprite):
 		self.last_rect = self.rect.copy()
 		self.z_layer = z_layer
 
+		# TODO add custom var to track whether initial or backtracking so group decices whether to draw
+
 class MovingSprite(Sprite):
 	def __init__(self, groups, start_pos, end_pos, move_dir, speed, flip = False):
 		surf = Surface((60,15))
@@ -55,7 +57,6 @@ class MovingSprite(Sprite):
 	def update(self, dt):
 		self.last_rect = self.rect.copy()
 
-		# handle movement.. TODO
 		self.rect.topleft += self.direction * self.speed * dt
 
 		self.update_movement_path()

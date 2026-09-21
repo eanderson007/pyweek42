@@ -3,29 +3,29 @@ import pygame
 from settings import *
 from .sprites import Sprite, MovingSprite
 from .player import Player
+from .groups import AllSprites
 
 class PlatformLevel:
 	def __init__(self, tmx_map, level_frames):
 		self.display_surface = pygame.display.get_surface()
 		self.level_frames = level_frames
 		self.back_tracking = False
+		self.player = None # declared in setup
 
 		# groups 
-		self.level_sprites = pygame.sprite.Group() # TODO whatever parts remain consistent between switch if any
-		self.initial_sprites = pygame.sprite.Group()
-		self.backtrack_sprites = pygame.sprite.Group()
-
-		# TODO will need to track initial and backtrack collision sprites
+		# TODO I want custom behaviour that draws sprites only whether initial or backtracking
+		self.level_sprites = AllSprites()
 		self.collision_sprites = pygame.sprite.Group()
 		self.semi_collision_sprites = pygame.sprite.Group()
 		
 		self.setup(tmx_map)
 	
 	def __setup_tiles(self, tmx_map):# tiles 
+		# TODO initial or backtracking custom param on tmx map obj tjen passed in to sprite class
 		for layer in ['Terrain']:
 			for x, y, surf in tmx_map.get_layer_by_name(layer).tiles():
 				groups = [self.collision_sprites]
-				if layer == 'Terrain': groups.append(self.initial_sprites)
+				if layer == 'Terrain': groups.append(self.level_sprites)
 				match layer:
 					case 'BG': z = Z_LAYERS['bg tiles']
 					case 'FG': z = Z_LAYERS['bg tiles']
@@ -36,13 +36,13 @@ class PlatformLevel:
 	def __setup_player(self, tmx_map):
 		for obj in tmx_map.get_layer_by_name('Objects'):
 			if obj.name == 'player':
-				Player((obj.x, obj.y), self.level_sprites, self.collision_sprites, self.semi_collision_sprites, obj.image)
+				self.player = Player((obj.x, obj.y), self.level_sprites, self.collision_sprites, self.semi_collision_sprites, obj.image)
 
 	def __setup_static_objects(self, tmx_map):
 		# TODO what kind of objects..?
 		for obj in tmx_map.get_layer_by_name('Objects'):
 			if obj.name == 'skull':
-				Sprite((obj.x, obj.y), obj.image, self.level_sprites)
+				Sprite((obj.x, obj.y), obj.image, [self.level_sprites])
 
 	def __get_moving_obj_position_attrs(self, width, height, x, y):
 		if width > height: # horizontal
@@ -62,7 +62,7 @@ class PlatformLevel:
 			speed = obj.properties['speed'] 
 
 			if obj.name == 'helicoptor':
-				groups = [self.initial_sprites, self.semi_collision_sprites]
+				groups = [self.level_sprites, self.semi_collision_sprites]
 				MovingSprite(groups, start_pos, end_pos, move_dir, speed)
 
 	def setup(self, tmx_map):
@@ -74,19 +74,10 @@ class PlatformLevel:
 		self.__setup_player(tmx_map)
 
 	def draw_sprite_images(self):
-		if self.back_tracking:
-			self.backtrack_sprites.draw(self.display_surface)
-		else:
-			self.initial_sprites.draw(self.display_surface)
-
-		self.level_sprites.draw(self.display_surface)
+		# TODO backttacing or not?
+		self.level_sprites.draw(self.player.hitbox_rect.center)
 
 	def update_sprites(self, dt):
-		if self.back_tracking:
-			self.backtrack_sprites.update(dt)
-		else:
-			self.initial_sprites.update(dt)
-
 		self.level_sprites.update(dt)
 
 	def run(self, dt):

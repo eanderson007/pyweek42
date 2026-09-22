@@ -14,6 +14,7 @@ class TimerType(Enum):
     WALL_SLIDE_BLOCK = auto()
     DOWN_ACTION = auto()
     ATTACK_BLOCK = auto()
+    INIT_JUMP_BLOCK = auto()
 
 class AxisType(Enum):
     HORIZONTAL = auto()
@@ -73,14 +74,15 @@ class Player(pygame.sprite.Sprite):
 			TimerType.WALL_JUMP: Timer(WALL_JUMP_TIME),
 			TimerType.WALL_SLIDE_BLOCK: Timer(WALL_BLOCK_TIME),
 			TimerType.DOWN_ACTION: Timer(DOWN_SKIP_TIME),
-			TimerType.ATTACK_BLOCK: Timer(ATTACK_TIME)
+			TimerType.ATTACK_BLOCK: Timer(ATTACK_TIME),
+			TimerType.INIT_JUMP_BLOCK: Timer(50)
         }
 	
 	def input(self):
 		keys = pygame.key.get_pressed()
 		input_vector = vector(0,0)
 		
-		if not self.timers[TimerType.WALL_JUMP].active:
+		if not self.timers[TimerType.WALL_JUMP].active and not self.timers[TimerType.INIT_JUMP_BLOCK].active:
 			if keys[pygame.K_RIGHT]:
 				input_vector.x += 1
 				self.facing_right = True
@@ -110,16 +112,15 @@ class Player(pygame.sprite.Sprite):
 		for sprite in self.collision_sprites:
 			if sprite.rect.colliderect(self.hitbox_rect):
 				if axis == AxisType.HORIZONTAL:
-
 					# LEFT COLLISION: Player moving left, hitting the right side of a wall
                     # Check if player's left edge crossed the wall's right edge AND was safely to the right of it last frame
 					if self.hitbox_rect.left <= sprite.rect.right and int(self.last_rect.left) >= int(sprite.last_rect.right):
-						self.hitbox_rect.left = sprite.rect.right +2
+						self.hitbox_rect.left = sprite.rect.right
 
                     # RIGHT COLLISION: Player moving right, hitting the left side of a wall
                     # Check if player's right edge crossed the wall's left edge AND was safely to the left of it last frame
 					if self.hitbox_rect.right >= sprite.rect.left and int(self.last_rect.right) <= int(sprite.last_rect.left):
-						self.hitbox_rect.right = sprite.rect.left -2
+						self.hitbox_rect.right = sprite.rect.left
 				
 				else: 
                     # TOP COLLISION: Player moving up, hitting the bottom of a ceiling or platform
@@ -196,6 +197,7 @@ class Player(pygame.sprite.Sprite):
 			if self.active_surface[ActiveSurface.FLOOR]:
 				self.direction.y = -JUMP
 				self.timers[TimerType.WALL_SLIDE_BLOCK].activate()
+				self.timers[TimerType.INIT_JUMP_BLOCK].activate()
 				self.hitbox_rect.bottom -= 1
 			
 			elif any((self.active_surface[ActiveSurface.LEFT], self.active_surface[ActiveSurface.RIGHT])) and not self.timers[TimerType.WALL_SLIDE_BLOCK].active:
@@ -219,10 +221,40 @@ class Player(pygame.sprite.Sprite):
         # update actual position after hitbox moved
 		self.rect.center = self.hitbox_rect.center
 
+	def other_move(self, dt):
+		# horizontal 
+		self.hitbox_rect.x += self.direction.x * self.speed * dt
+		self.collision('horizontal')
+		
+		# vertical 
+		if not self.active_surface[ActiveSurface.FLOOR] and any((self.active_surface[ActiveSurface.LEFT], self.active_surface[ActiveSurface.RIGHT])) and not self.timers[TimerType.WALL_SLIDE_BLOCK].active:
+			self.direction.y = 0
+			self.hitbox_rect.y += self.gravity / 10 * dt
+		else:
+			self.direction.y += self.gravity / 2 * dt
+			self.hitbox_rect.y += self.direction.y * dt
+			self.direction.y += self.gravity / 2 * dt
+
+		if self.jump:
+			if self.active_surface[ActiveSurface.FLOOR]:
+				self.direction.y = -JUMP
+				self.timers[TimerType.WALL_SLIDE_BLOCK].activate()
+				self.hitbox_rect.bottom -= 1
+				# self.jump_sound.play()
+			elif any((self.active_surface[ActiveSurface.LEFT], self.active_surface[ActiveSurface.RIGHT])) and not self.timers[TimerType.WALL_SLIDE_BLOCK].active:
+				self.timers[TimerType.WALL_JUMP].activate()
+				self.direction.y = -JUMP
+				self.direction.x = 1 if self.active_surface[ActiveSurface.LEFT] else -1
+				# self.jump_sound.play()
+			self.jump = False
+		
+		self.collision('vertical')
+		self.semi_collision()
+		self.rect.center = self.hitbox_rect.center
+
 	def platform_move(self, dt):
 		if self.platform:
 			self.hitbox_rect.topleft += self.platform.direction * self.platform.speed * dt
-			self.rect.center = self.hitbox_rect.center
 
 	def update_timers(self):
 		for timer in self.timers.values():
@@ -275,7 +307,8 @@ class Player(pygame.sprite.Sprite):
 
 		self.platform_move(dt)
 		self.move(dt)
+		
 		self.check_contact()
-
 		self.update_state()
+
 		self.animate(dt)

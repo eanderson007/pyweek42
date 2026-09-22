@@ -4,6 +4,7 @@ from settings import *
 from .sprites import *
 from .player import Player
 from .groups import AllSprites
+from .beings import Rat
 
 class PlatformLevel:
 	def __init__(self, tmx_map, level_frames):
@@ -18,6 +19,7 @@ class PlatformLevel:
 		self.collision_sprites = pygame.sprite.Group()
 		self.semi_collision_sprites = pygame.sprite.Group()
 		self.damage_sprites = pygame.sprite.Group()
+		self.rat_sprites = pygame.sprite.Group()
 		
 		self.setup(tmx_map)
 	
@@ -91,21 +93,34 @@ class PlatformLevel:
 			for y in range(top, bottom, 20):
 				Sprite((x, y), self.level_frames['dot'], self.level_sprites, z_layer=Z_LAYERS['bg details'])
 
+	def __create_roating_spikes(self, obj):
+		RotatingCirlceSpike(
+			pos = (obj.x + obj.width, obj.y + obj.height),
+			surf = self.level_frames['spike'],
+			groups = [self.level_sprites, self.damage_sprites],
+			radius = obj.properties['radius'],
+			speed = obj.properties['speed'],
+			start_angle = obj.properties['start_angle'],
+			end_angle = obj.properties['end_angle']
+		)
+		for radius in range(0, obj.properties['radius'], 20):
+			RotatingCirlceSpike(
+				pos = (obj.x + obj.width, obj.y + obj.height),
+				surf = self.level_frames['spike_chain'],
+				groups = [self.level_sprites],
+				radius = radius,
+				speed = obj.properties['speed'],
+				start_angle = obj.properties['start_angle'],
+				end_angle = obj.properties['end_angle']
+			)
+
 	def __setup_moving_objects(self, tmx_map):
 		for obj in tmx_map.get_layer_by_name('Moving Objects'):
 			move_dir, start_pos, end_pos = self.__get_moving_obj_position_attrs(obj.width, obj.height, obj.x, obj.y)
 			speed = obj.properties['speed'] 
 
 			if obj.name == 'spike':
-				RotatingCirlceSpike(
-					pos = (obj.x + obj.width, obj.y + obj.height),
-					surf = self.level_frames['spike'],
-					groups = [self.level_sprites, self.damage_sprites],
-					radius = obj.properties['radius'],
-					speed = obj.properties['speed'],
-					start_angle = obj.properties['start_angle'],
-					end_angle = obj.properties['end_angle']
-				)
+				self.__create_roating_spikes(obj)
 
 			else:
 				groups = self.__get_moving_obj_groups(obj.properties['platform'])
@@ -115,11 +130,23 @@ class PlatformLevel:
 				if obj.name == 'saw':
 					self.__create_movement_markers(start_pos, end_pos, move_dir)
 
+	def __setup_enemies(self, tmx_map):
+		for obj in tmx_map.get_layer_by_name('Enemies'):
+			if obj.name == 'rat':
+				Rat(
+					pos=(obj.x, obj.y),
+					frames=self.level_frames['rat'],
+					groups=[self.level_sprites, self.damage_sprites, self.rat_sprites],
+					collision_sprites=self.collision_sprites
+				)
+
 	def setup(self, tmx_map):
 		self.__setup_tiles(tmx_map)
 
 		self.__setup_static_objects(tmx_map)
 		self.__setup_moving_objects(tmx_map)
+
+		self.__setup_enemies(tmx_map)
 
 		self.__setup_player(tmx_map)
 

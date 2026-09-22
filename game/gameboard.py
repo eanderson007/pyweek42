@@ -39,7 +39,13 @@ class GameBoard:
             # damage objects
             'saw': import_folder('assets', 'imgs', 'graphics', 'damage_objects', 'saw'),
             'spike': import_image('assets', 'imgs', 'graphics', 'damage_objects', 'spike', 'Spiked Ball'),
+            'spike_chain': import_image('assets', 'imgs', 'graphics', 'damage_objects', 'spike', 'spiked_chain'),
 
             # player animation folders
-            'player': import_sub_folders('assets', 'imgs', 'graphics', 'player')
+            'player': import_sub_folders('assets', 'imgs', 'graphics', 'player'),
+
+            # enemy animations
+            'rat': import_folder('assets', 'imgs', 'graphics', 'beings', 'rat'),
+            'zombie': import_folder('assets', 'imgs', 'graphics', 'beings', 'zombie'),
+
         }

@@ -75,7 +75,7 @@ class Player(pygame.sprite.Sprite):
 			TimerType.WALL_SLIDE_BLOCK: Timer(WALL_BLOCK_TIME),
 			TimerType.DOWN_ACTION: Timer(DOWN_SKIP_TIME),
 			TimerType.ATTACK_BLOCK: Timer(ATTACK_TIME),
-			TimerType.INIT_JUMP_BLOCK: Timer(50)
+			TimerType.INIT_JUMP_BLOCK: Timer(50),
         }
 	
 	def input(self):
@@ -127,6 +127,7 @@ class Player(pygame.sprite.Sprite):
                     # Check if player's top edge crossed the wall's bottom edge AND was safely below it last frame
 					if self.hitbox_rect.top <= sprite.rect.bottom and int(self.last_rect.top) >= int(sprite.last_rect.bottom):
 						self.hitbox_rect.top = sprite.rect.bottom
+						self.direction.y = 0
 						
 						# If the obstacle is a moving platform, push the player down an extra 6 pixels 
 						# This prevents the player from clipping inside or getting stuck as the platform moves
@@ -219,37 +220,6 @@ class Player(pygame.sprite.Sprite):
 		self.__move_vertical(dt)
 		
         # update actual position after hitbox moved
-		self.rect.center = self.hitbox_rect.center
-
-	def other_move(self, dt):
-		# horizontal 
-		self.hitbox_rect.x += self.direction.x * self.speed * dt
-		self.collision('horizontal')
-		
-		# vertical 
-		if not self.active_surface[ActiveSurface.FLOOR] and any((self.active_surface[ActiveSurface.LEFT], self.active_surface[ActiveSurface.RIGHT])) and not self.timers[TimerType.WALL_SLIDE_BLOCK].active:
-			self.direction.y = 0
-			self.hitbox_rect.y += self.gravity / 10 * dt
-		else:
-			self.direction.y += self.gravity / 2 * dt
-			self.hitbox_rect.y += self.direction.y * dt
-			self.direction.y += self.gravity / 2 * dt
-
-		if self.jump:
-			if self.active_surface[ActiveSurface.FLOOR]:
-				self.direction.y = -JUMP
-				self.timers[TimerType.WALL_SLIDE_BLOCK].activate()
-				self.hitbox_rect.bottom -= 1
-				# self.jump_sound.play()
-			elif any((self.active_surface[ActiveSurface.LEFT], self.active_surface[ActiveSurface.RIGHT])) and not self.timers[TimerType.WALL_SLIDE_BLOCK].active:
-				self.timers[TimerType.WALL_JUMP].activate()
-				self.direction.y = -JUMP
-				self.direction.x = 1 if self.active_surface[ActiveSurface.LEFT] else -1
-				# self.jump_sound.play()
-			self.jump = False
-		
-		self.collision('vertical')
-		self.semi_collision()
 		self.rect.center = self.hitbox_rect.center
 
 	def platform_move(self, dt):

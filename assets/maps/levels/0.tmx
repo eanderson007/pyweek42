@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="60" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="43">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="60" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="45">
  <tileset firstgid="1" source="../tilesets/castle.tsx"/>
  <tileset firstgid="33" source="../tilesets/creatures1.tsx"/>
  <tileset firstgid="66" source="../tilesets/items.tsx"/>
@@ -95,6 +95,12 @@
  </objectgroup>
  <objectgroup id="7" name="Enemies">
   <object id="42" name="rat" gid="33" x="766.398" y="160.154" width="32" height="32"/>
+  <object id="43" name="shooter" x="235.97" y="127.461" width="18.1721" height="17.6376">
+   <properties>
+    <property name="reverse" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="44" name="zombie" gid="44" x="276.608" y="385.02" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="3" name="Objects">
   <object id="4" name="player" gid="57" x="226.235" y="320.678" width="32" height="32"/>

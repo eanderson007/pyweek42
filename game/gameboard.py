@@ -3,7 +3,7 @@ import pygame
 from pytmx.util_pygame import load_pygame
 
 from .asset_handling import *
-from .levels import PlatformLevel
+from .platformer_level import PlatformLevel
 from settings import *
 
 
@@ -14,7 +14,6 @@ class GameBoard:
         pygame.display.set_caption(TITLE)
         self.import_assets()
 
-        # TODO have enum explicity for level movement 
         self.tmx_maps = {
             0: load_pygame(join('.', 'assets', 'maps', 'levels', '0.tmx')),
             1: load_pygame(join('.', 'assets', 'maps', 'levels', '0_1.tmx'))
@@ -47,5 +46,8 @@ class GameBoard:
             # enemy animations
             'rat': import_folder('assets', 'imgs', 'graphics', 'beings', 'rat'),
             'zombie': import_folder('assets', 'imgs', 'graphics', 'beings', 'zombie'),
+
+            'shooter': import_sub_folders('assets', 'imgs', 'graphics','beings', 'shell'),
+			'bullet': import_image('assets', 'imgs',  'graphics', 'beings', 'bullets', 'pearl'),
 
         }

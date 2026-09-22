@@ -4,22 +4,29 @@ from settings import *
 from .sprites import *
 from .player import Player
 from .groups import AllSprites
-from .beings import Rat
+from .beings import Being, Shooter, Bullet
 
 class PlatformLevel:
 	def __init__(self, tmx_map, level_frames):
 		self.display_surface = pygame.display.get_surface()
 		self.level_frames = level_frames
-		self.back_tracking = False
+		# specific frames
+		self.bullet_surf = level_frames['bullet']
+
 		self.player = None # declared in setup
 
 		# groups 
-		# TODO I want custom behaviour that draws sprites only whether initial or backtracking
 		self.level_sprites = AllSprites()
 		self.collision_sprites = pygame.sprite.Group()
 		self.semi_collision_sprites = pygame.sprite.Group()
 		self.damage_sprites = pygame.sprite.Group()
+
 		self.rat_sprites = pygame.sprite.Group()
+		self.zombie_sprites = pygame.sprite.Group()
+		self.human_sprites = pygame.sprite.Group()
+
+		self.bullet_sprites = pygame.sprite.Group()
+		self.item_sprites = pygame.sprite.Group()
 		
 		self.setup(tmx_map)
 	
@@ -51,13 +58,12 @@ class PlatformLevel:
 					)
 
 	def __setup_static_objects(self, tmx_map):
-		# TODO what kind of objects..?
 		for obj in tmx_map.get_layer_by_name('Objects'):
 			# deal with single image static objects first
 			if obj.name in ('skull'):
 				Sprite((obj.x, obj.y), obj.image, [self.level_sprites])
 
-			# TODO then deal with animated static objects
+			# then deal with animated static objects
 			elif obj.name in ('small_chains'):
 				frames = self.level_frames[obj.name]
 				groups = [self.level_sprites]
@@ -130,15 +136,28 @@ class PlatformLevel:
 				if obj.name == 'saw':
 					self.__create_movement_markers(start_pos, end_pos, move_dir)
 
+	def create_bullet(self, pos, direction):
+		Bullet(pos, (self.level_sprites, self.damage_sprites, self.bullet_sprites), self.bullet_surf, direction, 150)
+
 	def __setup_enemies(self, tmx_map):
 		for obj in tmx_map.get_layer_by_name('Enemies'):
-			if obj.name == 'rat':
-				Rat(
+			if obj.name in ('rat', 'zombie'):
+				Being(
 					pos=(obj.x, obj.y),
-					frames=self.level_frames['rat'],
+					frames=self.level_frames[obj.name],
 					groups=[self.level_sprites, self.damage_sprites, self.rat_sprites],
-					collision_sprites=self.collision_sprites
+					collision_sprites=self.collision_sprites,
+					blood_timer=RAT_TIME if obj.name == 'rat' else ZOMBIE_TIME
 				)
+
+			if obj.name == 'shooter':
+				Shooter(
+					pos = (obj.x, obj.y), 
+					frames = self.level_frames['shooter'], 
+					groups = (self.level_sprites, self.collision_sprites), 
+					reverse = obj.properties['reverse'], 
+					player = self.player, 
+					create_bullet = self.create_bullet)
 
 	def setup(self, tmx_map):
 		self.__setup_tiles(tmx_map)
@@ -146,9 +165,8 @@ class PlatformLevel:
 		self.__setup_static_objects(tmx_map)
 		self.__setup_moving_objects(tmx_map)
 
-		self.__setup_enemies(tmx_map)
-
 		self.__setup_player(tmx_map)
+		self.__setup_enemies(tmx_map)
 
 	def draw_sprite_images(self):
 		# TODO backttacing or not?
@@ -163,14 +181,3 @@ class PlatformLevel:
 
 		# TODO need to know if we hit something in the level????
 		self.draw_sprite_images()
-
-class ImageLevel:
-	"""Takes a filepath to a JSON file that defines the filepath for each 
-	frame and the associated text. Click mouse anywhere to move through frames"""
-
-	def __init__(self, config_filepath: str):
-		self.filepath = config_filepath
-		self.load_frame_config(self.filepath)
-
-	def load_frame_config(self, filepath: str):
-		pass

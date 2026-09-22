@@ -20,6 +20,10 @@ def import_sub_folders(*path):
 				frame_dict[sub_folder] = import_folder(*path, sub_folder)
 	return frame_dict
 
+def import_image(*path, alpha = True, format = 'png'):
+	full_path = join(*path) + f'.{format}'
+	return pygame.image.load(full_path).convert_alpha() if alpha else pygame.image.load(full_path).convert()
+
 def get_frames_from_img(path_parts: list, tile_size: int, row: int):
     """row begins at 0"""
     image_path = join(*path_parts)

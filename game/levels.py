@@ -17,6 +17,7 @@ class PlatformLevel:
 		self.level_sprites = AllSprites()
 		self.collision_sprites = pygame.sprite.Group()
 		self.semi_collision_sprites = pygame.sprite.Group()
+		self.damage_sprites = pygame.sprite.Group()
 		
 		self.setup(tmx_map)
 	
@@ -74,14 +75,45 @@ class PlatformLevel:
 
 		return move_dir, start_pos, end_pos
 
+	def __get_moving_obj_groups(self, is_platform: bool):
+		return [self.level_sprites, self.semi_collision_sprites] if is_platform else [self.level_sprites, self.damage_sprites]
+
+	def __create_movement_markers(self, start_pos, end_pos, move_dir):
+		"""Draw dots indicating where the moving object's path is"""
+		if move_dir == 'x':
+			y = start_pos[1]
+			left, right = int(start_pos[0]), int(end_pos[0])
+			for x in range(left, right, 20):
+				Sprite((x, y), self.level_frames['dot'], self.level_sprites, z_layer=Z_LAYERS['bg details'])
+		else:
+			x = start_pos[0]
+			top, bottom = int(start_pos[1]), int(end_pos[1])
+			for y in range(top, bottom, 20):
+				Sprite((x, y), self.level_frames['dot'], self.level_sprites, z_layer=Z_LAYERS['bg details'])
+
 	def __setup_moving_objects(self, tmx_map):
 		for obj in tmx_map.get_layer_by_name('Moving Objects'):
 			move_dir, start_pos, end_pos = self.__get_moving_obj_position_attrs(obj.width, obj.height, obj.x, obj.y)
 			speed = obj.properties['speed'] 
 
-			if obj.name == 'helicoptor':
-				groups = [self.level_sprites, self.semi_collision_sprites]
-				MovingSprite(groups, start_pos, end_pos, move_dir, speed)
+			if obj.name == 'spike':
+				RotatingCirlceSpike(
+					pos = (obj.x + obj.width, obj.y + obj.height),
+					surf = self.level_frames['spike'],
+					groups = [self.level_sprites, self.damage_sprites],
+					radius = obj.properties['radius'],
+					speed = obj.properties['speed'],
+					start_angle = obj.properties['start_angle'],
+					end_angle = obj.properties['end_angle']
+				)
+
+			else:
+				groups = self.__get_moving_obj_groups(obj.properties['platform'])
+				frames = self.level_frames[obj.name] 
+				MovingSprite(frames, groups, start_pos, end_pos, move_dir, speed, flip=obj.properties['flip'])
+
+				if obj.name == 'saw':
+					self.__create_movement_markers(start_pos, end_pos, move_dir)
 
 	def setup(self, tmx_map):
 		self.__setup_tiles(tmx_map)

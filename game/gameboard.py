@@ -26,6 +26,20 @@ class GameBoard:
 
     def import_assets(self):
         self.level_frames = {
-            'small_chains': import_folder('assets', 'imgs', 'graphics', 'small_chains'),
+            # static animated
+            'small_chains': import_folder('assets', 'imgs', 'graphics', 'objects', 'small_chains'),
+            'helicoptor': import_folder('assets', 'imgs', 'graphics', 'objects', 'helicopter'),
+
+            # static
+            'dot': import_image('assets', 'imgs', 'graphics', 'objects', 'dot'),
+
+            # moving animated
+            'boat': import_folder('assets', 'imgs', 'graphics', 'objects', 'boat'),
+
+            # damage objects
+            'saw': import_folder('assets', 'imgs', 'graphics', 'damage_objects', 'saw'),
+            'spike': import_image('assets', 'imgs', 'graphics', 'damage_objects', 'spike', 'Spiked Ball'),
+
+            # player animation folders
             'player': import_sub_folders('assets', 'imgs', 'graphics', 'player')
         }

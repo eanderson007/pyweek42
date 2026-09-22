@@ -50,7 +50,7 @@ class Player(pygame.sprite.Sprite):
 
         # rects
 		self.rect = self.image.get_frect(topleft = pos)
-		self.hitbox_rect = self.rect.inflate(-42,-38) # TODO is this img depednent
+		self.hitbox_rect = self.rect.inflate(-48,-38) # TODO is this img depednent
 		self.last_rect = self.hitbox_rect.copy()
 
 		# movement 
@@ -110,24 +110,25 @@ class Player(pygame.sprite.Sprite):
 		for sprite in self.collision_sprites:
 			if sprite.rect.colliderect(self.hitbox_rect):
 				if axis == AxisType.HORIZONTAL:
+
 					# LEFT COLLISION: Player moving left, hitting the right side of a wall
                     # Check if player's left edge crossed the wall's right edge AND was safely to the right of it last frame
 					if self.hitbox_rect.left <= sprite.rect.right and int(self.last_rect.left) >= int(sprite.last_rect.right):
-						self.hitbox_rect.left = sprite.rect.right
+						self.hitbox_rect.left = sprite.rect.right +2
 
                     # RIGHT COLLISION: Player moving right, hitting the left side of a wall
                     # Check if player's right edge crossed the wall's left edge AND was safely to the left of it last frame
 					if self.hitbox_rect.right >= sprite.rect.left and int(self.last_rect.right) <= int(sprite.last_rect.left):
-						self.hitbox_rect.right = sprite.rect.left
+						self.hitbox_rect.right = sprite.rect.left -2
 				
 				else: 
                     # TOP COLLISION: Player moving up, hitting the bottom of a ceiling or platform
                     # Check if player's top edge crossed the wall's bottom edge AND was safely below it last frame
 					if self.hitbox_rect.top <= sprite.rect.bottom and int(self.last_rect.top) >= int(sprite.last_rect.bottom):
 						self.hitbox_rect.top = sprite.rect.bottom
-                        
-                        # If the obstacle is a moving platform, push the player down an extra 6 pixels 
-                        # This prevents the player from clipping inside or getting stuck as the platform moves
+						
+						# If the obstacle is a moving platform, push the player down an extra 6 pixels 
+						# This prevents the player from clipping inside or getting stuck as the platform moves
 						if hasattr(sprite, 'moving'): 
 							self.hitbox_rect.top += 7 
 
@@ -135,8 +136,7 @@ class Player(pygame.sprite.Sprite):
                     # Check if player's bottom edge crossed the wall's top edge AND was safely above it last frame
 					if self.hitbox_rect.bottom >= sprite.rect.top and int(self.last_rect.bottom) <= int(sprite.last_rect.top):
 						self.hitbox_rect.bottom = sprite.rect.top
-						
-					self.direction.y = 0 # if any type of vertical collision reset direction y = 0
+						self.direction.y = 0
     
 	def semi_collision(self):
 		if not self.timers[TimerType.DOWN_ACTION].active:
@@ -175,7 +175,7 @@ class Player(pygame.sprite.Sprite):
 		
 		self.__update_surface_contact(floor_rect, right_rect, left_rect)
 		self.__update_platform_contact(floor_rect)
-		
+
 	def __move_horizontal(self, dt):
 		self.hitbox_rect.x += self.direction.x * self.speed * dt
 		self.collision(AxisType.HORIZONTAL)
@@ -199,9 +199,9 @@ class Player(pygame.sprite.Sprite):
 				self.hitbox_rect.bottom -= 1
 			
 			elif any((self.active_surface[ActiveSurface.LEFT], self.active_surface[ActiveSurface.RIGHT])) and not self.timers[TimerType.WALL_SLIDE_BLOCK].active:
-				self.timers[TimerType.WALL_JUMP].activate()
-				self.direction.y = -JUMP
-				self.direction.x = 1 if self.active_surface[ActiveSurface.LEFT] else -1
+					self.timers[TimerType.WALL_JUMP].activate()
+					self.direction.y = -JUMP
+					self.direction.x = 1 if self.active_surface[ActiveSurface.LEFT] else -1
 			
 			self.jump = False
 
@@ -210,7 +210,7 @@ class Player(pygame.sprite.Sprite):
 		self.collision(AxisType.VERTICAL)
 		self.semi_collision()
 		
-		self.__handle_jump(dt) # does not change hitbox position only for next round
+		self.__handle_jump(dt)
 
 	def move(self, dt):
 		self.__move_horizontal(dt)
@@ -272,7 +272,7 @@ class Player(pygame.sprite.Sprite):
 		self.update_timers()
 
 		self.input()
-		
+
 		self.platform_move(dt)
 		self.move(dt)
 		self.check_contact()

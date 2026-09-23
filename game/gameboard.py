@@ -3,7 +3,7 @@ import pygame
 from pytmx.util_pygame import load_pygame
 
 from .asset_handling import *
-from .cutscene_level import CutsceneLevel
+from .cutscene_level import CutsceneLevel, EndScene
 from .platformer_level import PlatformLevel
 from settings import *
 
@@ -25,11 +25,12 @@ class GameBoard:
             2: load_pygame(join('.', 'assets', 'maps', 'levels', '0_1.tmx'))
         }
         self.levels = {
-            1: CutsceneLevel(self.level_frames, self.fonts),
+            # 1: EndScene(('config', 'end.json'), self.level_frames),
+            1: CutsceneLevel(('config', '1.json'), self.level_frames, self.fonts),
             2: PlatformLevel(self.platformer_tmx_maps[1], self.level_frames, self.fonts, self.total_time)
         }
 
-        self.game_over_scene = CutsceneLevel(text='GAME OVER')
+        self.game_over_scene = EndScene(('config', 'end.json'), self.level_frames)
         self.last_level = sorted(key for key in self.levels.keys())[-1]
         self.level_index = 1
         self.current_stage = self._get_level()
@@ -76,7 +77,14 @@ class GameBoard:
 
         ui_frames = {
             'heart': import_folder('assets', 'imgs', 'graphics', 'ui', 'heart'), 
-			'coin': import_image('assets', 'imgs', 'graphics', 'ui', 'coin')
+			'coin': import_image('assets', 'imgs', 'graphics', 'ui', 'coin'),
+            'banners': {
+                'large_roll' : import_image('assets', 'imgs', 'graphics', 'display', 'large_roll'), 
+                'text_banner_sprite' : import_image('assets', 'imgs', 'graphics', 'display', 'text_banner_sprite'), 
+                'roll' : import_image('assets', 'imgs', 'graphics', 'display', 'roll'),
+                'right_arrow': import_image('assets', 'imgs', 'graphics', 'display', 'right_arrow'),
+                'left_arrow': import_image('assets', 'imgs', 'graphics', 'display', 'left_arrow')
+            }
         }
 
         self.level_frames = {
@@ -84,7 +92,10 @@ class GameBoard:
             'small_chains': import_folder('assets', 'imgs', 'graphics', 'objects', 'small_chains'),
             'helicoptor': import_folder('assets', 'imgs', 'graphics', 'objects', 'helicopter'),
             'flag': import_folder('assets', 'imgs', 'graphics', 'objects', 'flag'),
+
+            # background data
             'bg_tiles': import_folder_dict('assets', 'imgs', 'graphics', 'bg', 'tiles'),
+            'sunset_scenery': import_image('assets', 'imgs',  'graphics', 'bg', 'imgs', 'sunset_scenery'),
 
             # static
             'dot': import_image('assets', 'imgs', 'graphics', 'objects', 'dot'),

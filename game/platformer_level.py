@@ -18,10 +18,6 @@ class PlatformLevel(Level):
 		self.level_frames = level_frames
 		self.particle_frames = level_frames['particle']
 
-		# for tracking level completion
-		self.death = False
-		self.complete = False
-
 		# ui overlap to level and data
 		self.fonts = fonts
 		self.ui = LevelUI(self.fonts['runescape'], self.level_frames['level_ui'])

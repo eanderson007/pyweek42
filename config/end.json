@@ -1,0 +1,10 @@
+{
+    "frame_0": {
+        "sprite_name": "vampire",
+        "text": "goodbye"
+    },
+    "frame_1": {
+        "sprite_name": "MIRROR",
+        "text": "world"
+    }
+}

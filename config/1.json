@@ -1,0 +1,14 @@
+{
+    "frame_0": {
+        "sprite_name": "vampire",
+        "text": ""
+    },
+    "frame_1": {
+        "sprite_name": "MIRROR",
+        "text": "world"
+    },
+    "frame_2": {
+        "sprite_name": "vampire",
+        "text": "our father who art in heaven hallow be thy name thy kingdom come thy will be done on earth as it is in heaven give us this day our daily bread and forgive"
+    }
+}

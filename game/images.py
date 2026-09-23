@@ -89,4 +89,4 @@ if __name__ == '__main__':
     show_tile(tiles, row, col)
 
     # TODO save image 
-    save_all_tiles(tiles, output_path)
+    # save_all_tiles(tiles, output_path)

@@ -3,6 +3,7 @@ import pygame
 from pytmx.util_pygame import load_pygame
 
 from .asset_handling import *
+from .cutscene_level import CutsceneLevel
 from .platformer_level import PlatformLevel
 from settings import *
 
@@ -14,20 +15,76 @@ class GameBoard:
         pygame.display.set_caption(TITLE)
         self.import_assets()
 
-        self.tmx_maps = {
-            0: load_pygame(join('.', 'assets', 'maps', 'levels', '0.tmx')),
-            1: load_pygame(join('.', 'assets', 'maps', 'levels', '0_1.tmx'))
+        # TODO tracks master data ie world timer, life timer and current level cap
+        self.total_time = 120 * 1000
+        self.total_coins = 0
+        self.total_good_deeds = 0
+
+        self.platformer_tmx_maps = {
+            1: load_pygame(join('.', 'assets', 'maps', 'levels', '0.tmx')),
+            2: load_pygame(join('.', 'assets', 'maps', 'levels', '0_1.tmx'))
         }
-        self.current_stage = PlatformLevel(self.tmx_maps[0], self.level_frames)
+        self.levels = {
+            1: CutsceneLevel(self.level_frames, self.fonts),
+            2: PlatformLevel(self.platformer_tmx_maps[1], self.level_frames, self.fonts, self.total_time)
+        }
+
+        self.game_over_scene = CutsceneLevel(text='GAME OVER')
+        self.last_level = sorted(key for key in self.levels.keys())[-1]
+        self.level_index = 1
+        self.current_stage = self._get_level()
+
+    def _get_level(self):
+        return self.levels[self.level_index]
+
+    def _set_current_stage(self, new_level):
+        """whenever set current stage update game totals from the completed stage"""
+        self.total_good_deeds += self.current_stage.get_good_deeds()
+        self.total_time = self.current_stage.get_time()
+        self.total_coins = self.current_stage.get_coins()
+
+        # if entering a platform level then set the coins and timer
+        new_level.set_time(self.total_time)
+        new_level.set_coins(self.total_coins)
+
+        self.current_stage = new_level
+
+    def update_scene(self):
+        if self.game_over_scene.complete:
+            # todo if self.game_over_scene.menu_button_clicked: self.return_to_menu = True
+            return # TODO go back to menu ??? could have custom inheretance cutscene with button that appears
+
+        elif self.current_stage.complete:
+            if self.level_index == self.last_level:
+                self._set_current_stage(self.game_over_scene) # TODO GameOverScene(good_deeds, death=False)
+
+            else:
+                self.level_index += 1
+                new_level = self._get_level()
+                print(new_level)
+                self._set_current_stage(new_level)
+
+        elif self.current_stage.death:
+            self._set_current_stage(self.game_over_scene) # TODO GameOverScene(good_deeds, death=True)
 
     def execute(self, dt):
+        self.update_scene()
+
         self.current_stage.run(dt)
 
     def import_assets(self):
+
+        ui_frames = {
+            'heart': import_folder('assets', 'imgs', 'graphics', 'ui', 'heart'), 
+			'coin': import_image('assets', 'imgs', 'graphics', 'ui', 'coin')
+        }
+
         self.level_frames = {
             # static animated
             'small_chains': import_folder('assets', 'imgs', 'graphics', 'objects', 'small_chains'),
             'helicoptor': import_folder('assets', 'imgs', 'graphics', 'objects', 'helicopter'),
+            'flag': import_folder('assets', 'imgs', 'graphics', 'objects', 'flag'),
+            'bg_tiles': import_folder_dict('assets', 'imgs', 'graphics', 'bg', 'tiles'),
 
             # static
             'dot': import_image('assets', 'imgs', 'graphics', 'objects', 'dot'),
@@ -46,8 +103,19 @@ class GameBoard:
             # enemy animations
             'rat': import_folder('assets', 'imgs', 'graphics', 'beings', 'rat'),
             'zombie': import_folder('assets', 'imgs', 'graphics', 'beings', 'zombie'),
-
             'shooter': import_sub_folders('assets', 'imgs', 'graphics','beings', 'shell'),
 			'bullet': import_image('assets', 'imgs',  'graphics', 'beings', 'bullets', 'pearl'),
+            'particle': import_folder('assets', 'imgs', 'graphics', 'objects', 'particle'), 
+
+            # items for player use
+            'items': import_sub_folders('assets', 'imgs', 'graphics', 'objects', 'items'),
+
+            'level_ui': ui_frames
 
         }
+
+        self.fonts = {
+            'runescape': pygame.font.Font(join('assets', 'imgs', 'graphics', 'ui', 'runescape_uf.ttf'), 20)
+        }
+
+		

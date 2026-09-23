@@ -5,6 +5,7 @@ from math import sin
 from os.path import join
 
 from .asset_handling import get_frames_from_img
+from .data import Data
 from settings import *
 from .timer import Timer
 
@@ -15,6 +16,7 @@ class TimerType(Enum):
     DOWN_ACTION = auto()
     ATTACK_BLOCK = auto()
     INIT_JUMP_BLOCK = auto()
+    HIT = auto()
 
 class AxisType(Enum):
     HORIZONTAL = auto()
@@ -40,6 +42,7 @@ class Player(pygame.sprite.Sprite):
 	def __init__(self, pos, groups, collision_sprites, semi_collision_sprites, surf, frames):
 		super().__init__(groups)
 		self.z_layer = Z_LAYERS['main']
+		self.data = Data()
 
 		# graphics animation control
 		self.state = PlayerState.IDLE
@@ -76,6 +79,7 @@ class Player(pygame.sprite.Sprite):
 			TimerType.DOWN_ACTION: Timer(DOWN_SKIP_TIME),
 			TimerType.ATTACK_BLOCK: Timer(ATTACK_TIME),
 			TimerType.INIT_JUMP_BLOCK: Timer(50),
+			TimerType.HIT: Timer(HIT_TIME)
         }
 	
 	def input(self):
@@ -282,3 +286,28 @@ class Player(pygame.sprite.Sprite):
 		self.update_state()
 
 		self.animate(dt)
+		self.flicker()
+
+	def flicker(self):
+		if self.timers[TimerType.HIT].active and sin(pygame.time.get_ticks() * 100) >= 0:
+			white_mask = pygame.mask.from_surface(self.image)
+			white_surf = white_mask.to_surface()
+			white_surf.set_colorkey('black')
+			self.image = white_surf
+
+	def update_item_data(self, item_type: str):
+		self.data.update(item_type)
+
+	def update_damage(self):
+		if not self.timers[TimerType.HIT].active:
+			self.data.health -= 1
+			self.timers[TimerType.HIT].activate()
+
+	def get_coins(self):
+		return self.data.coins
+
+	def set_coins(self, coins):
+			self.data.coins = coins
+
+	def get_health(self):
+		return self.data.health

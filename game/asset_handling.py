@@ -24,6 +24,15 @@ def import_image(*path, alpha = True, format = 'png'):
 	full_path = join(*path) + f'.{format}'
 	return pygame.image.load(full_path).convert_alpha() if alpha else pygame.image.load(full_path).convert()
 
+def import_folder_dict(*path):
+	frame_dict = {}
+	for folder_path, _, image_names in walk(join(*path)):
+		for image_name in image_names:
+			full_path = join(folder_path, image_name)
+			surface = pygame.image.load(full_path).convert_alpha()
+			frame_dict[image_name.split('.')[0]] = surface
+	return frame_dict
+
 def get_frames_from_img(path_parts: list, tile_size: int, row: int):
     """row begins at 0"""
     image_path = join(*path_parts)

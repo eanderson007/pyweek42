@@ -18,14 +18,7 @@ class Being(pygame.sprite.Sprite):
 		self.collision_rects = [sprite.rect for sprite in collision_sprites]
 		self.speed = BEING_SPEED
 
-		self.hit_timer = Timer(250)
-
-		self.blood_timer = blood_timer
-
-	def reverse(self):
-		if not self.hit_timer.active:
-			self.direction *= -1
-			self.hit_timer.activate()
+		self.blood_timer = blood_timer # TODO 
 
 	def animate(self, dt):
 		self.frame_index += ANIMATION_SPEED * dt
@@ -39,14 +32,22 @@ class Being(pygame.sprite.Sprite):
 		floor_rect_right = pygame.FRect(self.rect.bottomright, (1,1))
 		floor_rect_left = pygame.FRect(self.rect.bottomleft, (-1,1))
 		wall_rect = pygame.FRect(self.rect.topleft + vector(-1,0), (self.rect.width + 2, 1))
+		
+		left_wall_rect = pygame.FRect(self.rect.topleft + vector(-1, 0), (1, self.rect.height-2))
+		right_wall_rect = pygame.FRect(self.rect.topright, (1, self.rect.height-2))
 
 		if floor_rect_right.collidelist(self.collision_rects) < 0 and self.direction > 0 or\
 		    floor_rect_left.collidelist(self.collision_rects) < 0 and self.direction < 0 or \
 			wall_rect.collidelist(self.collision_rects) != -1:
+				
+				if right_wall_rect.collidelist(self.collision_rects) != -1:
+					self.rect.x -= 2
+				elif left_wall_rect.collidelist(self.collision_rects) != -1:
+					self.rect.x += 2
+
 				self.direction *= -1
 
 	def update(self, dt):
-		self.hit_timer.update()
 
 		self.animate(dt)
 		

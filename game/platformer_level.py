@@ -280,7 +280,7 @@ class LevelSetup:
 
 			elif obj.name == 'flag':
 				# TODO adjust size
-				AnimatedSprite((obj.x, obj.y), self.level_frames['flag'], [self.all_sprites])
+				Sprite((obj.x, obj.y), self.level_frames['flag'], [self.all_sprites])
 				self.level_finish_rect = pygame.FRect((obj.x, obj.y), (obj.width, obj.height))
 
 	def __get_moving_obj_position_attrs(self, width, height, x, y):

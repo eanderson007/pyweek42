@@ -30,3 +30,16 @@ ZOMBIE_TIME = 25
 HIT_TIME = 1000
 BUTTON_BLOCK = 500
 POTION_TIMER = 15 # TODO
+
+LEVEL_STATS = {
+    1: {
+        'coins': 10,
+        'seconds': 60
+	},
+    2: {
+        
+	},
+    3: {
+        
+	}
+}

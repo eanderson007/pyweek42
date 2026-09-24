@@ -72,14 +72,14 @@ def save_all_tiles(tiles, output_dir):
 
 if __name__ == '__main__':
     # 1. Load image
-    image_path = os.path.join('..', 'assets', 'imgs', 'creatures1.png')
-    output_path = os.path.join('..', 'assets', 'imgs', 'graphics', 'player')
+    image_path = os.path.join('..', 'assets', 'imgs', 'Tileset_Dungeon.png')
+    output_path = os.path.join('..', 'assets', 'imgs')
 
 
     image = load_image(image_path)
 
     # 2. Chop image into tiles
-    tile_size = (32, 32)  # width, height
+    tile_size = (64, 64)  # width, height
     tiles = chop_image(image, tile_size)
 
     # 3. Display a particular tile

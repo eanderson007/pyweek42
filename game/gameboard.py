@@ -109,7 +109,8 @@ class GameBoard:
                 'left_arrow': import_image('assets', 'imgs', 'graphics', 'display', 'left_arrow')
             },
             'bgs': {
-                'sunset_scenery': import_image('assets', 'imgs',  'graphics', 'bg', 'imgs', 'sunset_scenery')
+                'sunset_scenery': import_image('assets', 'imgs',  'graphics', 'bg', 'imgs', 'sunset_scenery'),
+                'grave': import_image('assets', 'imgs',  'graphics', 'bg', 'imgs', 'grave'),
             }
         }
 
@@ -117,7 +118,7 @@ class GameBoard:
             # static animated
             'small_chains': import_folder('assets', 'imgs', 'graphics', 'objects', 'small_chains'),
             'helicoptor': import_folder('assets', 'imgs', 'graphics', 'objects', 'helicopter'),
-            'flag': import_folder('assets', 'imgs', 'graphics', 'objects', 'flag'),
+            'flag': import_image('assets', 'imgs', 'graphics', 'objects', 'door'),
 
             # background data
             'bg_tiles': import_folder_dict('assets', 'imgs', 'graphics', 'bg', 'tiles'),

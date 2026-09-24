@@ -114,8 +114,8 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 
 			self.display_surface.blit(lines_surf, lines_rect)
 
-	def draw_control_arrows(self, left_position=(WINDOW_WIDTH-200,WINDOW_HEIGHT-105), 
-						 right_postion=(WINDOW_WIDTH-110,WINDOW_HEIGHT-105)):
+	def draw_control_arrows(self, left_position=(WINDOW_WIDTH-200,WINDOW_HEIGHT-100), 
+						 right_postion=(WINDOW_WIDTH-110,WINDOW_HEIGHT-100)):
 		# draw right and left arrows
 		for name, position in {'right_arrow': right_postion, 'left_arrow': left_position}.items():
 			surf = self.level_frames['level_ui']['banners'][name]
@@ -124,10 +124,14 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 			self.display_surface.blit(surf,rect)
 
 	def display_bg(self):
-		# else display the image
-		bg = self.level_frames["level_ui"]['bgs'][self.bg_img]
-		bg_rect = bg.get_rect(topleft = (0,0))
-		self.display_surface.blit(bg, bg_rect)
+		# TODO animate light 
+		if self.bg_img == 'black':
+			self.display_surface.fill('black')
+		else:
+			# else display the image
+			bg = pygame.transform.scale(self.level_frames["level_ui"]['bgs'][self.bg_img], (WINDOW_WIDTH, WINDOW_HEIGHT))
+			bg_rect = bg.get_rect(topleft = (0,0))
+			self.display_surface.blit(bg, bg_rect)
 
 	def display(self):
 		self.display_bg()

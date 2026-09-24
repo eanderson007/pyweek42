@@ -1,14 +1,23 @@
 {
     "frame_0": {
         "sprite_name": "vampire",
-        "text": ""
+        "name": "vampire",
+        "bg": "sunset_scenery",
+        "text": "vampire: estimated X seconds left util the end of the world"
     },
     "frame_1": {
-        "sprite_name": "MIRROR",
-        "text": "world"
+        "sprite_name": "vampire",
+        "bg": "sunset_scenery",
+        "text": "and I am stuck with a computer."
     },
     "frame_2": {
+        "sprite_name": "mirror",
+        "bg": "sunset_scenery",
+        "text": "M.I.R.R.O.R.: What's the use of "
+    },
+    "frame_3": {
         "sprite_name": "vampire",
-        "text": "our father who art in heaven hallow be thy name thy kingdom come thy will be done on earth as it is in heaven give us this day our daily bread and forgive"
+        "bg": "sunset_scenery",
+        "text": "our father who art in heaven hallow be thy name thy kingdom come thy will be done on earth as it is in heaven give us this day our daily bread!!..."
     }
 }

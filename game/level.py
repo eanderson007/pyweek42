@@ -1,8 +1,8 @@
 class Level:
-    def __init__(self):
+    def __init__(self, total_time):
         self.complete = False
         self.death = False 
-        self.total_time = 0
+        self.total_time = total_time
         self.good_deeds = 0
 
     def get_time(self): return self.total_time

@@ -9,18 +9,19 @@ from .level_ui import LevelUI
 
 from .debug import debug
 from .level import Level
+from .timer import Timer
 
 
 class PlatformLevel(Level):
 	def __init__(self, tmx_map, level_frames, fonts, total_time):
-		super().__init__()
+		super().__init__(total_time)
 		self.display_surface = pygame.display.get_surface()
 		self.level_frames = level_frames
 		self.particle_frames = level_frames['particle']
 
 		# ui overlap to level and data
 		self.fonts = fonts
-		self.ui = LevelUI(self.fonts['runescape'], self.level_frames['level_ui'])
+		self.ui = LevelUI(self.fonts['small_text1'], self.level_frames['level_ui'])
 
 		# level boundary constraints
 		self.level_width = tmx_map.width * TILE_SIZE
@@ -37,6 +38,12 @@ class PlatformLevel(Level):
 			get_background_tile(tmx_map, level_frames),
 			top_limit=get_background_top_limit(tmx_map)
 		)
+
+		self.startup = True
+		self.start_time = self.total_time
+		self.level_timer = Timer(1000 * total_time) # milliseconds
+		self.timer_offset = 0
+
 		self.collision_sprites = pygame.sprite.Group()
 		self.semi_collision_sprites = pygame.sprite.Group()
 		self.damage_sprites = pygame.sprite.Group()
@@ -78,6 +85,11 @@ class PlatformLevel(Level):
 			for sprite in self.item_sprites.sprites():
 				if sprite.rect.colliderect(self.player.hitbox_rect):
 					self.player.update_item_data(sprite.item_type)
+
+					# if the item is a blood bottle get more time
+					if sprite.item_type in ('blood'):
+						self.timer_offset += POTION_TIMER
+
 					kill_sprite_with_animation(sprite, self.particle_frames, self.level_sprites)
 
 	def attack_collision(self):
@@ -88,14 +100,17 @@ class PlatformLevel(Level):
 
 			attack_rect = self.player.rect.inflate(8,8) # TODO
 			if target.rect.colliderect(attack_rect) and self.player.attacking and (facing_target or self.player.direction.x ==0):
-				# TODO get more time from sucking blood / change level data
-				# TODO play slurping sound
+				# if "sucked blood" from a being then get more time
+				if isinstance(target, Being):
+					self.timer_offset += target.blood_timer
+
 				ParticleEffectSprite((target.rect.center), self.particle_frames, self.level_sprites)
 				target.kill()
 
 	def update_ui(self, dt):
 		self.ui.update_coins(self.player.get_coins())
 		self.ui.create_hearts(self.player.get_health())
+		self.ui.update_time(self.total_time)
 
 		self.ui.update(dt)
 
@@ -122,10 +137,36 @@ class PlatformLevel(Level):
 			# TODO show some kind of level complete rect??? until space bar or click??? rhen set complete
 			self.complete = True
 
+	def add_time(self):
+		self.level_timer.duration += (self.timer_offset * 1000) # timer must be in ms
+		self.start_time += self.timer_offset 
+		self.timer_offset = 0
+		
+		# TODO add some timed sprite that displays the additional time near the top
+		# box then dies shortly later
+
+	def update_level_time(self):
+		if self.startup:
+			self.level_timer.activate()
+			self.startup = False
+		else:
+			self.level_timer.update()
+			self.total_time = round(self.start_time - (self.level_timer.value / 1000), 3) # countdown 
+
+			if self.timer_offset != 0:
+				self.add_time()
+
+	def update_death_status(self):
+		if (self.player.get_health() == 0) or (self.total_time) == 0 or (self.player.hitbox_rect.top > self.level_bottom + 150):
+			self.death = True
+
 	def run(self, dt):
+		# first update everything
 		self.display_surface.fill('black')
+		self.update_level_time()
 		self.update_sprites(dt)
 
+		# then do calculations and adjustments 
 		self.bullet_collision()
 		self.hit_collision()
 		self.item_collision()
@@ -133,6 +174,10 @@ class PlatformLevel(Level):
 
 		self.check_constraint()
 
+		# check if lost the platorm level
+		self.update_death_status()
+
+		# finally draw everything with final data
 		self.draw_sprite_images()
 		self.update_ui(dt)
 
@@ -325,10 +370,11 @@ class LevelSetup:
 
 	def __setup_items(self, tmx_map):
 		for obj in tmx_map.get_layer_by_name('Items'):
+			frames = [obj.image] if obj.name in ('potion', 'blood') else self.level_frames['items'][obj.name]
 			Item(
 				item_type=obj.name,
 				pos=(obj.x + TILE_SIZE / 2, obj.y + TILE_SIZE / 2),
-				frames=self.level_frames['items'][obj.name],
+				frames=frames,
 				groups=[self.all_sprites, self.item_sprites],
 				data={}
 			)

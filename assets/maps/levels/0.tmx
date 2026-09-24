@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="60" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="56">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="60" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="59">
  <tileset firstgid="1" source="../tilesets/castle.tsx"/>
  <tileset firstgid="33" source="../tilesets/creatures1.tsx"/>
  <tileset firstgid="66" source="../tilesets/items.tsx"/>
@@ -102,8 +102,9 @@
   <object id="45" name="gold" gid="66" x="528.957" y="81.3642" width="64" height="64"/>
   <object id="46" name="skull" gid="68" x="590.289" y="558.552" width="64" height="64"/>
   <object id="47" name="silver" gid="67" x="813.176" y="434.393" width="64" height="64"/>
-  <object id="48" name="potion" gid="70" x="943.318" y="425.418" width="64" height="64"/>
   <object id="49" name="diamond" gid="69" x="686.025" y="78.3725" width="64" height="64"/>
+  <object id="57" name="potion" gid="133" x="1156.49" y="477.99" width="32" height="32"/>
+  <object id="58" name="blood" gid="132" x="1337.32" y="461.822" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="7" name="Enemies">
   <object id="42" name="rat" gid="33" x="766.398" y="160.154" width="32" height="32"/>

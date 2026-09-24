@@ -2,7 +2,7 @@
     "frame_0": {
         "sprite_name": "vampire",
         "bg": "sunset_scenery",
-        "text": "goodbye"
+        "text": "YOU LOSE... Try again?"
     },
     "frame_1": {
         "sprite_name": "MIRROR",

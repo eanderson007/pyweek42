@@ -7,6 +7,7 @@ class Timer:
 		self.start_time = 0
 		self.active = False
 		self.repeat = repeat
+		self.value = 0
 
 	def activate(self):
 		self.active = True
@@ -20,8 +21,11 @@ class Timer:
 
 	def update(self):
 		current_time = get_ticks()
-		if current_time - self.start_time >= self.duration:
+		self.value = current_time - self.start_time
+		
+		if self.value >= self.duration:
 			if self.func and self.start_time != 0:
 				self.func()
+			self.value = self.duration # stop value at max
 			self.deactivate()
 

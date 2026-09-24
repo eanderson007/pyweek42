@@ -55,7 +55,7 @@ class Being(pygame.sprite.Sprite):
 		self.reverse_direction()
 
 class Shooter(pygame.sprite.Sprite):
-	def __init__(self, pos, frames, groups, reverse, player, create_bullet, scale_by=0.8):
+	def __init__(self, pos, frames, groups, reverse, player, create_bullet, scale_by=1.4):
 		super().__init__(groups)
 
 		if reverse:
@@ -67,12 +67,12 @@ class Shooter(pygame.sprite.Sprite):
 					img = pygame.transform.scale_by(img, scale_by)
 					frames.append(img)
 				self.frames[key] = frames
-			self.bullet_direction = -1
+			self.bullet_direction = 1
 		else:
 			self.frames = {}
 			for key, surfs in frames.items():
 				self.frames[key] = [pygame.transform.scale_by(surf, scale_by) for surf in surfs]
-			self.bullet_direction = 1
+			self.bullet_direction = -1
 
 		self.frame_index = 0
 		self.state = 'idle'

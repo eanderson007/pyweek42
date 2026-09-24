@@ -71,7 +71,7 @@ class PlatformLevel(Level):
 		for sprite in self.collision_sprites:
 			sprite = pygame.sprite.spritecollide(sprite, self.bullet_sprites, True)
 			if sprite:
-				ParticleEffectSprite((sprite[0].rect.center), self.particle_frames, self.all_sprites)
+				ParticleEffectSprite((sprite[0].rect.center), self.particle_frames, self.level_sprites)
 
 	def hit_collision(self):
 		for sprite in self.damage_sprites:
@@ -86,11 +86,14 @@ class PlatformLevel(Level):
 				if sprite.rect.colliderect(self.player.hitbox_rect):
 					self.player.update_item_data(sprite.item_type)
 
-					# if the item is a blood bottle get more time
+					# if the item is a blood bottle get more time and draw blood animation
 					if sprite.item_type in ('blood'):
 						self.timer_offset += POTION_TIMER
+						frames = self.level_frames['blood']
+					else:
+						frames = self.particle_frames
 
-					kill_sprite_with_animation(sprite, self.particle_frames, self.level_sprites)
+					kill_sprite_with_animation(sprite, frames, self.level_sprites)
 
 	def attack_collision(self):
 		for target in self.bullet_sprites.sprites() + self.being_sprites.sprites():
@@ -100,12 +103,14 @@ class PlatformLevel(Level):
 
 			attack_rect = self.player.rect.inflate(8,8) # TODO
 			if target.rect.colliderect(attack_rect) and self.player.attacking and (facing_target or self.player.direction.x ==0):
-				# if "sucked blood" from a being then get more time
+				# if "sucked blood" from a being then get more time and show different animations
 				if isinstance(target, Being):
 					self.timer_offset += target.blood_timer
+					frames = self.level_frames['blood']
+				else:
+					frames = self.particle_frames
 
-				ParticleEffectSprite((target.rect.center), self.particle_frames, self.level_sprites)
-				target.kill()
+				kill_sprite_with_animation(target, frames, self.level_sprites)
 
 	def update_ui(self, dt):
 		self.ui.update_coins(self.player.get_coins())
@@ -267,19 +272,19 @@ class LevelSetup:
 	def __setup_static_objects(self, tmx_map):
 		for obj in tmx_map.get_layer_by_name('Objects'):
 			# deal with single image static objects first
-			if obj.name in ('example'):
+			if obj.name in ():
 				Sprite((obj.x, obj.y), obj.image, [self.all_sprites])
 
 			# then deal with animated static objects
-			elif obj.name in ('small_chains'):
+			elif obj.name in ('small_chains', 'torch'):
 				frames = self.level_frames[obj.name]
 				groups = [self.all_sprites]
 				z = Z_LAYERS['main'] if not 'bg' in obj.name else Z_LAYERS['bg details']
 				animation_speed = ANIMATION_SPEED 
 				AnimatedSprite((obj.x, obj.y), frames, groups, z_layer=z, animation_speed=animation_speed)
 
+			# to track the end of the level
 			elif obj.name == 'flag':
-				# TODO adjust size
 				Sprite((obj.x, obj.y), self.level_frames['flag'], [self.all_sprites])
 				self.level_finish_rect = pygame.FRect((obj.x, obj.y), (obj.width, obj.height))
 
@@ -294,9 +299,6 @@ class LevelSetup:
 			end_pos = (x + width / 2,y + height)
 
 		return move_dir, start_pos, end_pos
-
-	def __get_moving_obj_groups(self, is_platform: bool):
-		return [self.all_sprites, self.semi_collison_sprites] if is_platform else [self.all_sprites, self.damage_sprites]
 
 	def __create_movement_markers(self, start_pos, end_pos, move_dir):
 		"""Draw dots indicating where the moving object's path is"""
@@ -341,7 +343,7 @@ class LevelSetup:
 				self.__create_roating_spikes(obj)
 
 			else:
-				groups = self.__get_moving_obj_groups(obj.properties['platform'])
+				groups = [self.all_sprites, self.semi_collison_sprites] if obj.properties['platform'] else [self.all_sprites, self.damage_sprites]
 				frames = self.level_frames[obj.name] 
 				MovingSprite(frames, groups, start_pos, end_pos, move_dir, speed, flip=obj.properties['flip'])
 

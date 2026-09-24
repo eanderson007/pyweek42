@@ -58,12 +58,7 @@ class GameBoard:
         self.current_stage = new_level
 
     def update_scene(self):
-        # TODO if current_stage hasattr(retry) and retry is true
-        # if isinstance(self.current_stage, EndScene):
-        #     # we maintai the last index we were on...
-        #     new_level = self._get_level()
-        #     self._set_current_stage(new_level)
-
+    
         # if player died in stage then move to death screen
         if self.current_stage.death == True:
             if self.story_mode:
@@ -111,38 +106,51 @@ class GameBoard:
             'bgs': {
                 'sunset_scenery': import_image('assets', 'imgs',  'graphics', 'bg', 'imgs', 'sunset_scenery'),
                 'grave': import_image('assets', 'imgs',  'graphics', 'bg', 'imgs', 'grave'),
+                'beautiful_castle': import_image('assets', 'imgs',  'graphics', 'bg', 'imgs', 'beauitful_castle'),
+            },
+            'animations': {
+                'light': import_folder('assets', 'imgs',  'graphics', 'bg', 'animations', 'light'),
+                'explosion1': import_folder('assets', 'imgs',  'graphics', 'bg', 'animations', 'explosion', 'explosion1'),
+                'explosion2': import_folder('assets', 'imgs',  'graphics', 'bg', 'animations', 'explosion', 'explosion2'),
+                'fire': import_folder('assets', 'imgs',  'graphics', 'bg', 'animations', 'fire')
             }
         }
 
         self.level_frames = {
             # static animated
             'small_chains': import_folder('assets', 'imgs', 'graphics', 'objects', 'small_chains'),
+            'torch': import_folder('assets', 'imgs', 'graphics', 'objects', 'torch'),
             'helicoptor': import_folder('assets', 'imgs', 'graphics', 'objects', 'helicopter'),
-            'flag': import_image('assets', 'imgs', 'graphics', 'objects', 'door'),
 
             # background data
             'bg_tiles': import_folder_dict('assets', 'imgs', 'graphics', 'bg', 'tiles'),
 
             # static
             'dot': import_image('assets', 'imgs', 'graphics', 'objects', 'dot'),
+            'flag': import_image('assets', 'imgs', 'graphics', 'objects', 'door'),
 
-            # moving animated
+            # moving animated (ie barrel / platform / boat)
             'boat': import_folder('assets', 'imgs', 'graphics', 'objects', 'boat'),
 
             # damage objects
             'saw': import_folder('assets', 'imgs', 'graphics', 'damage_objects', 'saw'),
             'spike': import_image('assets', 'imgs', 'graphics', 'damage_objects', 'spike', 'Spiked Ball'),
             'spike_chain': import_image('assets', 'imgs', 'graphics', 'damage_objects', 'spike', 'spiked_chain'),
+            'wall_spikes': import_folder('assets', 'imgs', 'graphics', 'damage_objects', 'grate'),
+            'flying_bot': import_folder('assets', 'imgs', 'graphics', 'damage_objects', 'flying_bot'),
 
             # player animation folders
             'player': import_sub_folders('assets', 'imgs', 'graphics', 'player'),
 
             # enemy animations
             'rat': import_folder('assets', 'imgs', 'graphics', 'beings', 'rat'),
-            'zombie': import_folder('assets', 'imgs', 'graphics', 'beings', 'zombie'),
-            'shooter': import_sub_folders('assets', 'imgs', 'graphics','beings', 'shell'),
-			'bullet': import_image('assets', 'imgs',  'graphics', 'beings', 'bullets', 'pearl'),
+            'zombie': import_folder('assets', 'imgs', 'graphics', 'beings', 'zombie'), # TODO person instead
+
+            'shooter': import_sub_folders('assets', 'imgs', 'graphics','beings', 'shooter'),
+			'bullet': import_image('assets', 'imgs',  'graphics', 'beings', 'bullets', 'bullet'), 
+
             'particle': import_folder('assets', 'imgs', 'graphics', 'objects', 'particle'), 
+            'blood': import_folder('assets', 'imgs', 'graphics', 'objects', 'blood'), 
 
             # items for player use
             'items': import_sub_folders('assets', 'imgs', 'graphics', 'objects', 'items'),

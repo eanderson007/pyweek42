@@ -50,7 +50,7 @@ def show_tile(tiles, row, col):
         raise IndexError("Column index is out of range.")
 
     tile = tiles[row][col]
-
+    # plt.style.use('dark_background')
     plt.imshow(tile)
     plt.axis("off")
     plt.title(f"Tile: row={row}, col={col}")
@@ -72,21 +72,23 @@ def save_all_tiles(tiles, output_dir):
 
 if __name__ == '__main__':
     # 1. Load image
-    image_path = os.path.join('..', 'assets', 'imgs', 'Tileset_Dungeon.png')
-    output_path = os.path.join('..', 'assets', 'imgs')
+    image_path = os.path.join('..', 'assets', 'imgs', 'explosion2.png')
+    output_path = os.path.join('..', 'assets', 'imgs', 'graphics', 'bg', 'animations', 'explosion', 'explosion2')
 
 
     image = load_image(image_path)
 
     # 2. Chop image into tiles
-    tile_size = (64, 64)  # width, height
+    tile_size = (130,125)  # width, height
     tiles = chop_image(image, tile_size)
 
     # 3. Display a particular tile
     row = 0
     col = 0
 
-    show_tile(tiles, row, col)
+    # for i in range(0, 8, 1):
+    #     print(i)
+    #     show_tile(tiles, row, i)
 
     # TODO save image 
     # save_all_tiles(tiles, output_path)

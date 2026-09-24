@@ -6,6 +6,8 @@ from settings import *
 from .debug import debug
 from .level import Level
 from .timer import Timer
+from .sprites import AnimatedSprite
+from random import choice
 
 
 class CutsceneLevel(Level):
@@ -96,6 +98,8 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 		self.font = self.fonts['text1']
 		self.sprite_name = ''
 		self.bg_img = 'sunset_scenery'
+		self.animations = {}
+		self.animation_sprites = []
 
 		# settings
 		self.text_x_offset = 320
@@ -105,6 +109,59 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 
 		self.set_scene()
 
+	def prepare_scene_animations(self, animations: list):
+		new_animations = []
+		for animation_name, data in self.animations.items():
+
+			if animation_name == 'bright_light':
+				new_animations.append(
+					AnimatedSprite(
+						pos = data['position'],
+						frames=[pygame.transform.scale(surf, data['size']) for surf in self.level_frames["level_ui"]["animations"]["light"]],
+						groups=[],
+						z_layer=Z_LAYERS['main'],
+						animation_speed=ANIMATION_SPEED
+					)
+				)
+
+			elif animation_name == "explosions":
+				for explosion in data:
+					new_animations.append(
+						AnimatedSprite(
+							pos = explosion['position'],
+							frames=[pygame.transform.scale(surf, explosion['size']) for surf in self.level_frames["level_ui"]["animations"][explosion["name"]]],
+							groups=[],
+							z_layer=Z_LAYERS['main'],
+							animation_speed=(ANIMATION_SPEED + choice([-1, -2, 0, 1, 2, 3]))
+						)
+					)
+
+			elif animation_name == "fire":
+				for fire in data:
+					new_animations.append(
+						AnimatedSprite(
+							pos = fire['position'],
+							frames=[pygame.transform.scale(surf, fire['size']) for surf in self.level_frames["level_ui"]["animations"]["fire"]],
+							groups=[],
+							z_layer=Z_LAYERS['main'],
+							animation_speed=(ANIMATION_SPEED + choice([-1, -2, 0, 1, 2, 3]))
+						)
+					)
+
+		return new_animations
+
+	def set_scene(self):
+		# override
+		key = f'frame_{self.current_scene_index}'
+
+		self.sprite_name = self.scene_config[key]['sprite_name']
+		self.text = self.scene_config[key]['text']
+		self.wrapped_lines = self.prepare_wrapped_text(self.text, self.text_window_width, self.text_window_height)
+		
+		self.bg_img = self.scene_config[key]['bg']
+		self.animations = self.scene_config[key]['animations']
+		self.animation_sprites = self.prepare_scene_animations(self.animations)
+		
 	def draw_text(self, height=None, width=None, colour='Black'):
 		y = self.text_y_offset
 		for lines in self.wrapped_lines: 
@@ -124,7 +181,7 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 			self.display_surface.blit(surf,rect)
 
 	def display_bg(self):
-		# TODO animate light 
+		# draw main background
 		if self.bg_img == 'black':
 			self.display_surface.fill('black')
 		else:
@@ -183,6 +240,21 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 			elif keys[pygame.K_LEFT]:
 				self.move_scene(-1)
 				self.timers['button_press'].activate()
+
+	def animate(self, dt):
+		if len(self.animation_sprites) > 0:
+			for sprite in self.animation_sprites:
+				sprite.update(dt)
+				self.display_surface.blit(sprite.image, sprite.rect.topleft)
+
+	def run(self, dt):
+		self.update_timers()
+
+		self.input()
+
+		self.display()
+		self.animate(dt)
+		
 
 
 class EndScene(CutsceneLevel):

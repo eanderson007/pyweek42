@@ -1,0 +1,131 @@
+{
+    "frame_0": {
+        "sprite_name": "vampire",
+        "name": "vampire",
+        "bg": "black",
+        "animation": {
+            "bright_light": [300, 300],
+            "explosions": [
+                [[350,300], [200,200]]
+            ],
+            "fire": [
+                [[350,300], [500,500]]
+            ]
+        },
+        "text": "vampire: I died on September 17, 1816."
+    },
+    "frame_1": {
+        "sprite_name": "vampire",
+        "bg": "black",
+        "animation": [],
+        "text": "I was struck by a carriage and died on the street. It was cold. I was drunk."
+    },
+    "frame_2": {
+        "sprite_name": "vampire",
+        "bg": "black",
+        "animation": ["light"],
+        "text": "I lay there in a street, yet at the same time I approached a light. It shone so bright and white hot it seared me."
+    },
+    "frame_3": {
+        "sprite_name": "vampire",
+        "bg": "black",
+        "animation": "black",
+        "text": "I turned away. I heard a voice ask:"
+    },
+    "frame_4": {
+        "sprite_name": "vampire",
+        "bg": "black",
+        "animation": ["light", "red_eyes"],
+        "text": "'Not ready to pay your debts? Perhaps would you like some borrowed time?'"
+    },
+    "frame_5": {
+        "sprite_name": "vampire",
+        "bg": "sunset_scenery",
+        "animation": [],
+        "text": "That day I made a deal. I died, yet have remained, in this empty form, borrowing time from the blood of living beings."
+    },
+    "frame_6": {
+        "sprite_name": "vampire",
+        "bg": "sunset_scenery",
+        "animation": ["nuclear"],
+        "text": "And by living on and on, I now stand here on the eve of the end of the world, with nothing but a machine to talk to.."
+    },
+    "frame_7": {
+        "sprite_name": "mirror",
+        "bg": "sunset_scenery",
+        "animation": "",
+        "text": "M.I.R.R.O.R.: I am a supercomputer, not just a machine."
+    },
+    "frame_8": {
+        "sprite_name": "vampire",
+        "bg": "sunset_scenery",
+        "animation": "",
+        "text": "vampire: You are as lifeless as I. Yet you can know it not. Just a relic of past humankind, with only a devil like me to benefit from it all in these last days."
+    },
+    "frame_9": {
+        "sprite_name": "mirror",
+        "bg": "sunset_scenery",
+        "animation": "",
+        "text": "M.I.R.R.O.R.: Calculating what will happen first, you die or the world ends…"
+    },
+    "frame_10": {
+        "sprite_name": "vampire",
+        "bg": "sunset_scenery",
+        "animation": "",
+        "text": "vampire: Funny."
+    },
+    "frame_11": {
+        "sprite_name": "mirror",
+        "bg": "sunset_scenery",
+        "animation": "",
+        "text": "M.I.R.R.O.R.: Estimated 5 minutes before the end of the world. Calculating your time before death..."
+    },
+    "frame_12": {
+        "sprite_name": "vampire",
+        "bg": "sunset_scenery",
+        "animation": "",
+        "text": "vampire: I am as dead at this moment. There are hardly any animals left, just rats, and even fewer humans. I must have blood to survive."
+    },
+    "frame_13": {
+        "sprite_name": "vampire",
+        "bg": "sunset_scenery",
+        "animation": "",
+        "text": "..."
+    },
+    "frame_14": {
+        "sprite_name": "vampire",
+        "bg": "sunset_scenery",
+        "animation": "",
+        "text": "What has it all been for? Why am I here? Does any of it matter? What am I even asking- I mean - I mean - what is the meaning of what I should be asking?"
+    },
+    "frame_15": {
+        "sprite_name": "vampire",
+        "bg": "sunset_scenery",
+        "animation": "",
+        "text": "M.I.R.R.O.R - you are the culmination of all that mankind built in its glory, surely your calculations shall yield the most correct answer!"
+    },
+     "frame_16": {
+        "sprite_name": "vampire",
+        "bg": "sunset_scenery",
+        "animation": "",
+        "text": "Answer me why- what-, answer I beg of you!"
+    },
+    "frame_17": {
+        "sprite_name": "mirror",
+        "bg": "sunset_scenery",
+        "animation": "",
+        "text": "M.I.R.R.O.R.: ..."
+    },
+    "frame_18": {
+        "sprite_name": "mirror",
+        "bg": "sunset_scenery",
+        "animation": "",
+        "text": "Cannot calculate your request. "
+    },
+    "frame_19": {
+        "sprite_name": "vampire",
+        "bg": "sunset_scenery",
+        "animation": "",
+        "text": "vampire: !!!"
+    }
+}

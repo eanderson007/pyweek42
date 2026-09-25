@@ -113,20 +113,38 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 		self.text_window_height = (WINDOW_HEIGHT / 2) - 75
 		self.text_window_width = WINDOW_WIDTH - 400
 
+		# Cache variables for pre-scaled static elements
+		self._cached_bg_img = None
+		self._cached_bg_key = None
+		self._cached_sprite_img = None
+		self._cached_sprite_key = None
+
 		self.timers['start_up_buffer'] = Timer(1000) # don't change the screen for at least one second
 		self.timers['start_up_buffer'].activate()
+
+		# Pre-scale fixed UI surfaces once during initialization
+		text_banner_raw = self.level_frames['level_ui']['banners']['text_banner_sprite']
+		self.scaled_text_banner = pygame.transform.scale(text_banner_raw, (int(WINDOW_WIDTH - 15), int(WINDOW_HEIGHT / 2)))
+		self.banner_rect = self.scaled_text_banner.get_rect(topleft=(15, 355))
+
+        # Pre-scale standard arrow graphics
+		arrow_left_raw = self.level_frames['level_ui']['banners'].get('left_arrow')
+		arrow_right_raw = self.level_frames['level_ui']['banners'].get('right_arrow')
+		self.scaled_left_arrow = pygame.transform.scale(arrow_left_raw, (80, 80)) if arrow_left_raw else None
+		self.scaled_right_arrow = pygame.transform.scale(arrow_right_raw, (80, 80)) if arrow_right_raw else None
 
 		self.set_scene()
 
 	def prepare_scene_animations(self, animations: list):
 		new_animations = []
+		scale_func = pygame.transform.scale
 		for animation_name, data in self.animations.items():
 
 			if animation_name in ('bright_light', 'red_light'):
 				new_animations.append(
 					AnimatedSprite(
 						pos = data['position'],
-						frames=[pygame.transform.scale(surf, data['size']) for surf in self.level_frames["level_ui"]["animations"][animation_name]],
+						frames=[scale_func(surf, data['size']) for surf in self.level_frames["level_ui"]["animations"][animation_name]],
 						groups=[],
 						z_layer=Z_LAYERS['main'],
 						animation_speed=ANIMATION_SPEED
@@ -138,7 +156,7 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 					new_animations.append(
 						AnimatedSprite(
 							pos = explosion['position'],
-							frames=[pygame.transform.scale(surf, explosion['size']) for surf in self.level_frames["level_ui"]["animations"][explosion["name"]]],
+							frames=[scale_func(surf, explosion['size']) for surf in self.level_frames["level_ui"]["animations"][explosion["name"]]],
 							groups=[],
 							z_layer=Z_LAYERS['main'],
 							animation_speed=(ANIMATION_SPEED + choice([-1, -2, 0, 1, 2, 3]))
@@ -149,7 +167,7 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 				new_animations.append(
 					AnimatedSprite(
 						pos = data['position'],
-						frames=[pygame.transform.scale(surf, data['size']) for surf in self.level_frames["level_ui"]["animations"]["fire"]],
+						frames=[scale_func(surf, data['size']) for surf in self.level_frames["level_ui"]["animations"]["fire"]],
 						groups=[],
 						z_layer=Z_LAYERS['main'],
 						animation_speed=(ANIMATION_SPEED + choice([-1, -2, 0, 1, 2, 3]))
@@ -169,59 +187,69 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 		self.bg_img = self.scene_config[key]['bg']
 		self.animations = self.scene_config[key]['animations']
 		self.animation_sprites = self.prepare_scene_animations(self.animations)
+
+		# Pre-cache and scale the Scene's Background Image
+		if self.bg_img != 'black':
+			if self._cached_bg_key != self.bg_img:
+				raw_bg = self.level_frames["level_ui"]['bgs'][self.bg_img]
+				self._cached_bg_img = pygame.transform.scale(raw_bg, (int(WINDOW_WIDTH), int(WINDOW_HEIGHT)))
+				self._cached_bg_key = self.bg_img
+		else:
+			self._cached_bg_img = None
+			self._cached_bg_key = 'black'
+
+        # Pre-cache and scale the talking Character Sprite
+		if len(self.sprite_name) > 0:
+			if self._cached_sprite_key != self.sprite_name:
+				raw_sprite = self.level_frames['level_ui']['sprites'][self.sprite_name]
+				self._cached_sprite_img = pygame.transform.scale(raw_sprite, (260, 260))
+				self._cached_sprite_key = self.sprite_name
+		else:
+			self._cached_sprite_img = None
+			self._cached_sprite_key = ''
+
+        # Pre-render static text layout surfaces into a scene cache
+		self._cached_text_surfaces = []
+		for line in self.wrapped_lines:
+			surf = self.font.render(line, True, 'Black')
+			self._cached_text_surfaces.append(surf)
 		
 	def draw_text(self, height=None, width=None, colour='Black'):
 		y = self.text_y_offset
-		for lines in self.wrapped_lines: 
-			y = y + self.font_size_offset
-			lines_surf = self.font.render(lines, True, colour)
-			lines_rect = lines_surf.get_rect(topleft = (self.text_x_offset, y))
-
-			self.display_surface.blit(lines_surf, lines_rect)
+		blit = self.display_surface.blit
+		for lines_surf in self._cached_text_surfaces: 
+			y += self.font_size_offset
+			blit(lines_surf, (self.text_x_offset, y))
 
 	def draw_control_arrows(self, left_position=(WINDOW_WIDTH-200,WINDOW_HEIGHT-100), 
-						 right_postion=(WINDOW_WIDTH-110,WINDOW_HEIGHT-100)):
+						 right_position=(WINDOW_WIDTH-110,WINDOW_HEIGHT-100)):
 		# draw right and left arrows unless first page
-		if self.current_scene_index == 0:
-			arrow_config = {'right_arrow': right_postion}
-		else:
-			arrow_config = {'right_arrow': right_postion, 'left_arrow': left_position}
-
-		for name, position in arrow_config.items():
-			surf = self.level_frames['level_ui']['banners'][name]
-			surf = pygame.transform.scale(surf, (80,80))
-			rect = surf.get_rect(topleft = position)
-			self.display_surface.blit(surf,rect)
+		blit = self.display_surface.blit
+        
+        # Right Arrow
+		if self.scaled_right_arrow:
+			blit(self.scaled_right_arrow, right_position)
+            
+        # Left Arrow (Skip on scene 0)
+		if self.current_scene_index > 0 and self.scaled_left_arrow:
+			blit(self.scaled_left_arrow, left_position)
 
 	def display_bg(self):
-		# draw main background
 		if self.bg_img == 'black':
 			self.display_surface.fill('black')
-		else:
-			# else display the image
-			bg = pygame.transform.scale(self.level_frames["level_ui"]['bgs'][self.bg_img], (WINDOW_WIDTH, WINDOW_HEIGHT))
-			bg_rect = bg.get_rect(topleft = (0,0))
-			self.display_surface.blit(bg, bg_rect)
+		elif self._cached_bg_img:
+			self.display_surface.blit(self._cached_bg_img, (0, 0))
 
 	def display(self):
+		blit = self.display_surface.blit
+        
 		self.display_bg()
-
-		# draw the dialouge and sprite banner across bottom part of screen
-		banner_position = (15,355)
-		text_banner = self.level_frames['level_ui']['banners']['text_banner_sprite']
-		text_banner = pygame.transform.scale(text_banner, (WINDOW_WIDTH - 15, WINDOW_HEIGHT / 2))
-		banner_rect = text_banner.get_rect(topleft = banner_position)
-		self.display_surface.blit(text_banner,banner_rect)
-
+		blit(self.scaled_text_banner, self.banner_rect)
 		self.draw_control_arrows()
 
-		# draw sprite that is talking 
-		sprite_position = (0, WINDOW_HEIGHT-250)
-		if len(self.sprite_name) > 0:
-			sprite_img = self.level_frames['level_ui']['sprites'][self.sprite_name]
-			sprite_scaled = pygame.transform.scale(sprite_img, (260, 260))
-			sprite_rect = sprite_scaled.get_rect(topleft = sprite_position)
-			self.display_surface.blit(sprite_scaled,sprite_rect)
+        # Draw the cached, scaled talking sprite
+		if self._cached_sprite_img:
+			blit(self._cached_sprite_img, (0, int(WINDOW_HEIGHT - 250)))
 
 		self.draw_text()
 

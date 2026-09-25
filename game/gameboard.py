@@ -33,7 +33,7 @@ class GameBoard:
         self.current_stage = self._get_level(self.level_index)
 
     def _get_level(self, level_index):
-        if level_index == 1:
+        if level_index == 4:
             return SpriteTalkingCutsceneLevel(('config', '1.json'), self.fonts, self.total_time,
                                           level_frames=self.level_frames)
 
@@ -43,7 +43,7 @@ class GameBoard:
         if level_index == 3:
             return SpriteTalkingCutsceneLevel(('config', '2.json'), self.fonts, self.total_time, level_frames=self.level_frames)
 
-        elif level_index == 4:
+        elif level_index == 1:
             return PlatformLevel(self.platformer_tmx_maps[2], self.level_frames, self.fonts, self.total_time)
 
         elif level_index == 5:

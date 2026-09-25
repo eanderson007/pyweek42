@@ -68,11 +68,15 @@ class PlatformLevel(Level):
 		self.level_sprites.update(dt)
 
 	def bullet_collision(self):
-		for sprite in self.collision_sprites:
-			sprite = pygame.sprite.spritecollide(sprite, self.bullet_sprites, True)
-			if sprite:
-				ParticleEffectSprite((sprite[0].rect.center), self.particle_frames, self.level_sprites)
-
+		collisions = pygame.sprite.groupcollide(self.bullet_sprites, self.collision_sprites, True, False)
+		for bullet, terrain_sprites in collisions.items():
+        # Use the bullet's center as the explosion point
+			ParticleEffectSprite(
+				bullet.rect.center, 
+				self.particle_frames, 
+				self.level_sprites
+			)
+		
 	def hit_collision(self):
 		for sprite in self.damage_sprites:
 			if sprite.rect.colliderect(self.player.hitbox_rect) and not self.player.attacking:
@@ -95,9 +99,8 @@ class PlatformLevel(Level):
 
 					kill_sprite_with_animation(sprite, frames, self.level_sprites)
 
-	def attack_collision(self):
-		for target in self.bullet_sprites.sprites() + self.being_sprites.sprites():
-
+	def check_attack_collision(self, target_sprites):
+		for target in target_sprites:
 			facing_target = self.player.rect.centerx < target.rect.centerx and self.player.facing_right or \
 							self.player.rect.centerx > target.rect.centerx and not self.player.facing_right
 
@@ -110,12 +113,15 @@ class PlatformLevel(Level):
 				else:
 					frames = self.particle_frames
 
-				# TODO if killed zombie/humans then that is a bad deed
+				# if killed zombie/humans then that is a bad deed
 				if isinstance(target, Being) and target.name == 'zombie':
 					self.good_deeds -= 1
-					print('lost good deed')
 
 				kill_sprite_with_animation(target, frames, self.level_sprites)
+
+	def attack_collision(self):
+			for sprite_list in (self.bullet_sprites.sprites(), self.being_sprites.sprites()):
+				self.check_attack_collision(sprite_list)
 
 	def update_ui(self, dt):
 		self.ui.update_coins(self.player.get_coins())
@@ -241,19 +247,52 @@ class LevelSetup:
 		self.__setup_items(tmx_map)	
 
 	def __setup_tiles(self, tmx_map):
-		for layer in ['Terrain', 'BG', 'FG', 'Platforms']:
-			for x, y, surf in tmx_map.get_layer_by_name(layer).tiles():
-				groups = [self.all_sprites]
+		# Calculate total pixel dimensions of the map
+		map_pixel_width = tmx_map.width * TILE_SIZE
+		map_pixel_height = tmx_map.height * TILE_SIZE
 
-				if layer == 'Terrain': groups.append(self.collision_sprites)
-				if layer == 'Platforms': groups.append(self.semi_collison_sprites)
+		for layer_name in ['Terrain', 'BG', 'FG', 'Platforms']:
+			try:
+				layer = tmx_map.get_layer_by_name(layer_name)
+			except ValueError:
+				continue  # Skip layer if it doesn't exist in this TMX file
 
-				match layer:
-					case 'BG': z = Z_LAYERS['bg tiles']
-					case 'FG': z = Z_LAYERS['bg tiles']
-					case _: z = Z_LAYERS['main']
+			match layer_name:
+				case 'BG' | 'FG': z = Z_LAYERS['bg tiles']
+				case _: z = Z_LAYERS['main']
 
-				Sprite((x * TILE_SIZE,y * TILE_SIZE), surf, groups, z_layer=z)
+			layer_surface = pygame.Surface((map_pixel_width, map_pixel_height), pygame.SRCALPHA)
+
+			for x, y, surf in layer.tiles():
+				layer_surface.blit(surf, (x * TILE_SIZE, y * TILE_SIZE))
+
+			StaticLayerSprite(layer_surface, z, [self.all_sprites])
+
+			if layer_name in ('Terrain', 'Platforms'):
+				for x, y, _ in layer.tiles():
+					# Create an invisible Sprite purely for physics
+					collision_dummy = PlaceholderSprite()
+					collision_dummy.set_rect_custom(pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+					
+					if layer_name == 'Terrain':
+						self.collision_sprites.add(collision_dummy)
+					elif layer_name == 'Platforms':
+						self.semi_collison_sprites.add(collision_dummy)
+
+	# def __setup_tiles(self, tmx_map):
+	# 	for layer in ['Terrain', 'BG', 'FG', 'Platforms']:
+	# 		for x, y, surf in tmx_map.get_layer_by_name(layer).tiles():
+	# 			groups = [self.all_sprites]
+
+	# 			if layer == 'Terrain': groups.append(self.collision_sprites)
+	# 			if layer == 'Platforms': groups.append(self.semi_collison_sprites)
+
+	# 			match layer:
+	# 				case 'BG': z = Z_LAYERS['bg tiles']
+	# 				case 'FG': z = Z_LAYERS['bg tiles']
+	# 				case _: z = Z_LAYERS['main']
+
+	# 			Sprite((x * TILE_SIZE,y * TILE_SIZE), surf, groups, z_layer=z)
 
 	def __setup_player(self, tmx_map):
 		for obj in tmx_map.get_layer_by_name('Objects'):

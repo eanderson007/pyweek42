@@ -92,11 +92,15 @@ class LevelUI:
 		self.coin_timer.update()
 		self.sprites.update(dt)
 
+		# draw the data banner
 		self.display_data_header()
 		self.display_text(str(self.coin_amount), (106, 39))
 		self.display_text(f'{self.time_seconds}', (self.banner_surf.width/2, 95))
 
+		# draw the hearts
 		self.sprites.draw(self.display_surface)
+
+		# draw the animated timer and associated text
 		self.update_clock_banner_sprites(dt)
 		
 

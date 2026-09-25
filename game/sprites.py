@@ -1,6 +1,6 @@
 from enum import Enum, auto
 from math import sin, cos, radians
-from pygame import sprite, Surface
+from pygame import sprite, Surface, Rect
 from pygame.math import Vector2 as vector
 from pygame.transform import scale_by as ScaleBy
 from pygame.transform import flip as flip_image
@@ -145,3 +145,22 @@ class RotatingCircleSpike(Sprite):
 		y = self.center[1] + sin(radians(self.angle)) * self.radius
 		x = self.center[0] + cos(radians(self.angle)) * self.radius
 		self.rect.center = (x,y)
+
+class StaticLayerSprite(sprite.Sprite):
+    def __init__(self, surface, z_layer, groups):
+        super().__init__(groups)
+        self.image = surface
+        self.rect = self.image.get_rect(topleft=(0, 0))
+        self.last_rect = self.rect.copy()
+        self.z_layer = z_layer
+
+class PlaceholderSprite(sprite.Sprite):
+	def __init__(self):
+			super().__init__([])
+			self.rect = Rect()
+			self.last_rect = self.rect.copy()
+			self.z_layer = 1
+
+	def set_rect_custom(self, rect):
+		self.rect = rect
+		self.last_rect = rect.copy()

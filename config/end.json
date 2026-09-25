@@ -1,12 +1,72 @@
 {
     "frame_0": {
         "sprite_name": "vampire",
-        "bg": "sunset_scenery",
-        "text": "goodbye"
+        "name": "vampire",
+        "bg": "server",
+        "animations": {
+        },
+        "text": "vampire: M.I.R.R.O.R.! I've finally reached the servers! And look, there is the command line entry station!"
     },
     "frame_1": {
-        "sprite_name": "MIRROR",
-        "bg": "sunset_scenery",
-        "text": "world"
+        "sprite_name": "vampire",
+        "name": "vampire",
+        "bg": "server",
+        "animations": {
+        },
+        "text": "... here ... The command line ... I've entered my question, M.I.R.R.O.R!"
+    },
+    "frame_2": {
+        "sprite_name": "mirror",
+        "name": "vampire",
+        "bg": "server",
+        "animations": {
+        },
+        "text": "M.I.R.R.O.R.: Calculating 'why life, why existence, why everything' ..."
+    },
+    "frame_3": {
+        "sprite_name": "vampire",
+        "name": "vampire",
+        "bg": "beautiful_castle",
+        "animations": {
+            "explosions": [
+                    {"name" : "explosion1", "position": [410,300], "size": [130,125]},
+                    {"name" : "explosion2", "position": [100,0], "size": [200,195]},
+                    {"name" : "explosion1", "position": [470,110], "size": [80,95]},
+                    {"name" : "explosion2", "position": [700,180], "size": [110,105]},
+                    {"name" : "explosion1", "position": [880,40], "size": [210,200]}
+            ]
+        },
+        "text": "vampire: Hurry, M.I.R.R.O.R! The end of world timer is almost up! It's all almost reached the castle! I cannot face death not knowing!"
+    },
+    "frame_4": {
+        "sprite_name": "mirror",
+        "name": "vampire",
+        "bg": "server",
+        "animations": {
+        },
+        "text": "M.I.R.R.O.R.: ... the answer is 42."
+    },
+    "frame_5": {
+        "sprite_name": "vampire",
+        "name": "vampire",
+        "bg": "server",
+        "animations": {
+        },
+        "text": "vampire: NOOO! Stupid machine! That is a joke answer from thousands of years ago!"
+    },
+    "frame_6": {
+        "sprite_name": "",
+        "name": "vampire",
+        "bg": "server",
+        "animations": {
+            "explosions": [
+                    {"name" : "explosion1", "position": [410,20], "size": [330,325]},
+                    {"name" : "explosion2", "position": [0,0], "size": [400,495]},
+                    {"name" : "explosion1", "position": [470,210], "size": [180,195]},
+                    {"name" : "explosion2", "position": [700,180], "size": [210,205]},
+                    {"name" : "explosion1", "position": [880,40], "size": [410,400]}
+            ]
+        },
+        "text": "End of the World Timer: 0"
     }
 }

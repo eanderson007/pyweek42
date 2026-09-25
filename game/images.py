@@ -1,6 +1,8 @@
-from PIL import Image
+from PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
 import os
+
+WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 672
 
 
 def load_image(image_path):
@@ -68,19 +70,56 @@ def save_all_tiles(tiles, output_dir):
 
     print(f"Saved {sum(len(row) for row in tiles)} tiles to {output_dir}")
 
-
+def place_icon_with_circular_mask(icon_path, output_path, bg_size, icon_size, position):
+    # 1. Create a new black background
+    base_image = Image.new("RGB", bg_size, color="black")
+    
+    # 2. Open and resize the icon
+    icon = Image.open(icon_path)
+    icon_resized = icon.resize(icon_size, Image.Resampling.LANCZOS)
+    
+    # 3. Calculate the 20% larger mask size
+    mask_w = int(icon_size[0] * 1.2)
+    mask_h = int(icon_size[1] * 1.2)
+    mask_size = (mask_w, mask_h)
+    
+    # 4. Create a transparent mask canvas
+    mask_layer = Image.new("RGBA", mask_size, color=(0, 0, 0, 0))
+    
+    # 5. Draw a 20% opaque white circle on the transparent canvas
+    # 20% opacity = 51 out of 255
+    draw = ImageDraw.Draw(mask_layer)
+    draw.ellipse([0, 0, mask_w - 1, mask_h - 1], fill=(255, 255, 255, 51))
+    
+    # 6. Paste the circular white mask onto the black background
+    base_image.paste(mask_layer, position, mask=mask_layer)
+    
+    # 7. Calculate the centered position for the icon over the circular mask
+    offset_x = position[0] + (mask_w - icon_size[0]) // 2
+    offset_y = position[1] + (mask_h - icon_size[1]) // 2
+    icon_position = (offset_x, offset_y)
+    
+    # 8. Paste the icon on top of the circle
+    if icon_resized.mode in ("RGBA", "LA"):
+        base_image.paste(icon_resized, icon_position, mask=icon_resized)
+    else:
+        base_image.paste(icon_resized, icon_position)
+        
+    # 9. Save the final photo
+    base_image.save(output_path)
+    print(f"Saved new image with circular mask to {output_path}")
 
 if __name__ == '__main__':
     # 1. Load image
-    image_path = os.path.join('..', 'assets', 'imgs', 'explosion2.png')
-    output_path = os.path.join('..', 'assets', 'imgs', 'graphics', 'bg', 'animations', 'explosion', 'explosion2')
+    image_path = os.path.join('..', 'assets', 'imgs', 'graphics', 'bg', 'imgs', 'Computer01.png')
+    output_path = os.path.join('..', 'assets', 'imgs', 'graphics', 'bg', 'imgs', 'computer.png')
 
 
-    image = load_image(image_path)
+    # image = load_image(image_path)
 
     # 2. Chop image into tiles
     tile_size = (130,125)  # width, height
-    tiles = chop_image(image, tile_size)
+    # tiles = chop_image(image, tile_size)
 
     # 3. Display a particular tile
     row = 0
@@ -92,3 +131,17 @@ if __name__ == '__main__':
 
     # TODO save image 
     # save_all_tiles(tiles, output_path)
+
+    bg_dimensions = (WINDOW_WIDTH, WINDOW_HEIGHT)      # Width and height of the new background
+    new_icon_size = (250, 250)      # Width and height for the resized icon
+    width = (WINDOW_WIDTH / 2) - 150
+    print(width)
+    paste_location = (490, 50)     # (x, y) coordinates for top-left corner of the icon
+    
+    # place_icon_with_circular_mask(
+    #     icon_path=image_path,
+    #     output_path=output_path,
+    #     bg_size=bg_dimensions,
+    #     icon_size=new_icon_size,
+    #     position=paste_location
+    # )

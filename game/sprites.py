@@ -33,6 +33,8 @@ class AnimatedSprite(Sprite):
 	def animate(self, dt):
 		self.frame_index += self.animation_speed * dt
 		self.image = self.frames[int(self.frame_index % len(self.frames))]
+		if self.frame_index > len(self.frames):
+			self.frame_index = 0
 
 	def update(self, dt):
 		self.animate(dt)

@@ -5,12 +5,6 @@ from settings import *
 from .sprites import AnimatedSprite
 from .timer import Timer
 
-"""
-TODO 
-change so veritcal stack
-only show coins on timer. use ICON instead???
-use a banner instead of white box
-"""
 
 class LevelUI:
 	def __init__(self, font, frames):
@@ -32,6 +26,30 @@ class LevelUI:
 		# frame for player data
 		self.banner_surf = self.frames['banners']['roll']
 		self.banner_rect =  self.banner_surf.get_frect(topleft = (0,0))
+
+		# create sprites for the clock and banner animations
+		clock_frames = [pygame.transform.scale_by(surf, 2) for surf in frames['clock']]
+		self.clock_sprite = AnimatedSprite(
+			pos = (WINDOW_WIDTH - clock_frames[0].width - 55, 10),
+			frames=clock_frames,
+			groups=[],
+			z_layer=Z_LAYERS['main'],
+			animation_speed=ANIMATION_SPEED/2
+		)
+
+		banner_frames = [
+			self.font.render('World Ending...', False, 'Black'),
+			self.font.render('', False, 'Black'),
+			self.font.render('World Ending...', False, 'Red'),
+			self.font.render('', False, 'Black')
+			]
+		self.banner_sprite = AnimatedSprite(
+			pos = (WINDOW_WIDTH - banner_frames[0].width - 25, 110),
+			frames=banner_frames,
+			groups=[],
+			z_layer=Z_LAYERS['main'],
+			animation_speed=ANIMATION_SPEED/4
+		)
 
 	def display_data_header(self):
 		self.display_surface.blit(self.banner_surf, self.banner_rect)
@@ -63,6 +81,13 @@ class LevelUI:
 	def update_time(self, time_seconds):
 		self.time_seconds = time_seconds
 
+	def update_clock_banner_sprites(self, dt):
+		self.clock_sprite.animate(dt)
+		self.banner_sprite.animate(dt)
+
+		self.display_surface.blit(self.clock_sprite.image, self.clock_sprite.rect.topleft)
+		self.display_surface.blit(self.banner_sprite.image, self.banner_sprite.rect.topleft)
+
 	def update(self, dt):
 		self.coin_timer.update()
 		self.sprites.update(dt)
@@ -72,6 +97,8 @@ class LevelUI:
 		self.display_text(f'{self.time_seconds}', (self.banner_surf.width/2, 95))
 
 		self.sprites.draw(self.display_surface)
+		self.update_clock_banner_sprites(dt)
+		
 
 class Heart(AnimatedSprite):
 	def __init__(self, pos, frames, groups):

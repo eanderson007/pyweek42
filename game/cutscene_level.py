@@ -21,9 +21,13 @@ class CutsceneLevel(Level):
 		self.font_size_offset = 50
 		self.font = self.fonts['text1']
 
-		self.scene_config = self.get_config(filepath)
 		self.current_scene_index = 0
-		self.last_scene_index = sorted([int(key.split('_')[-1]) for key in self.scene_config.keys()])[-1]
+		if len(filepath) > 0:
+			self.scene_config = self.get_config(filepath)
+			self.last_scene_index = sorted([int(key.split('_')[-1]) for key in self.scene_config.keys()])[-1]
+		else:
+			self.last_scene_index = 0
+			self.scene_config = {}
 
 		self.coins = 0 # TODO also need ot set coins
 		self.text = ''
@@ -34,9 +38,10 @@ class CutsceneLevel(Level):
 				}
 
 	def get_config(self, filepath) -> dict:
-			path = join(*filepath)
-			with open(path, "r", encoding="utf-8") as file:
-				return json.load(file)
+			if len(filepath) > 0:
+				path = join(*filepath)
+				with open(path, "r", encoding="utf-8") as file:
+					return json.load(file)
 
 	def prepare_wrapped_text(self, text, width, height):
 			# Calculate how many lines can fit vertically in the given height
@@ -100,6 +105,7 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 		self.bg_img = 'sunset_scenery'
 		self.animations = {}
 		self.animation_sprites = []
+		self.start_up = True
 
 		# settings
 		self.text_x_offset = 320
@@ -107,17 +113,20 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 		self.text_window_height = (WINDOW_HEIGHT / 2) - 75
 		self.text_window_width = WINDOW_WIDTH - 400
 
+		self.timers['start_up_buffer'] = Timer(1000) # don't change the screen for at least one second
+		self.timers['start_up_buffer'].activate()
+
 		self.set_scene()
 
 	def prepare_scene_animations(self, animations: list):
 		new_animations = []
 		for animation_name, data in self.animations.items():
 
-			if animation_name == 'bright_light':
+			if animation_name in ('bright_light', 'red_light'):
 				new_animations.append(
 					AnimatedSprite(
 						pos = data['position'],
-						frames=[pygame.transform.scale(surf, data['size']) for surf in self.level_frames["level_ui"]["animations"]["light"]],
+						frames=[pygame.transform.scale(surf, data['size']) for surf in self.level_frames["level_ui"]["animations"][animation_name]],
 						groups=[],
 						z_layer=Z_LAYERS['main'],
 						animation_speed=ANIMATION_SPEED
@@ -137,16 +146,15 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 					)
 
 			elif animation_name == "fire":
-				for fire in data:
-					new_animations.append(
-						AnimatedSprite(
-							pos = fire['position'],
-							frames=[pygame.transform.scale(surf, fire['size']) for surf in self.level_frames["level_ui"]["animations"]["fire"]],
-							groups=[],
-							z_layer=Z_LAYERS['main'],
-							animation_speed=(ANIMATION_SPEED + choice([-1, -2, 0, 1, 2, 3]))
-						)
+				new_animations.append(
+					AnimatedSprite(
+						pos = data['position'],
+						frames=[pygame.transform.scale(surf, data['size']) for surf in self.level_frames["level_ui"]["animations"]["fire"]],
+						groups=[],
+						z_layer=Z_LAYERS['main'],
+						animation_speed=(ANIMATION_SPEED + choice([-1, -2, 0, 1, 2, 3]))
 					)
+				)
 
 		return new_animations
 
@@ -173,8 +181,13 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 
 	def draw_control_arrows(self, left_position=(WINDOW_WIDTH-200,WINDOW_HEIGHT-100), 
 						 right_postion=(WINDOW_WIDTH-110,WINDOW_HEIGHT-100)):
-		# draw right and left arrows
-		for name, position in {'right_arrow': right_postion, 'left_arrow': left_position}.items():
+		# draw right and left arrows unless first page
+		if self.current_scene_index == 0:
+			arrow_config = {'right_arrow': right_postion}
+		else:
+			arrow_config = {'right_arrow': right_postion, 'left_arrow': left_position}
+
+		for name, position in arrow_config.items():
 			surf = self.level_frames['level_ui']['banners'][name]
 			surf = pygame.transform.scale(surf, (80,80))
 			rect = surf.get_rect(topleft = position)
@@ -204,10 +217,11 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 
 		# draw sprite that is talking 
 		sprite_position = (0, WINDOW_HEIGHT-250)
-		sprite_img = self.level_frames['level_ui']['sprites'][self.sprite_name]
-		sprite_scaled = pygame.transform.scale(sprite_img, (260, 260))
-		sprite_rect = sprite_scaled.get_rect(topleft = sprite_position)
-		self.display_surface.blit(sprite_scaled,sprite_rect)
+		if len(self.sprite_name) > 0:
+			sprite_img = self.level_frames['level_ui']['sprites'][self.sprite_name]
+			sprite_scaled = pygame.transform.scale(sprite_img, (260, 260))
+			sprite_rect = sprite_scaled.get_rect(topleft = sprite_position)
+			self.display_surface.blit(sprite_scaled,sprite_rect)
 
 		self.draw_text()
 
@@ -222,7 +236,11 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 
 		# then check if cutscene over
 		elif self.current_scene_index == self.last_scene_index:
-			self.complete = True
+			# ensure do not skip a single scene cutscene
+			if self.start_up and len(self.scene_config) == 1:
+				self.start_up = False
+			else:
+				self.complete = True
 
 		else:
 			self.current_scene_index += indx_move
@@ -231,7 +249,7 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 	def input(self):
 		keys = pygame.key.get_pressed()
 
-		if not self.timers['button_press'].active:
+		if not self.timers['button_press'].active and not self.timers['start_up_buffer'].active:
 
 			if keys[pygame.K_RIGHT]:
 				self.move_scene(1)
@@ -256,16 +274,17 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 		self.animate(dt)
 		
 
-
 class EndScene(CutsceneLevel):
-	def __init__(self, filepath, fonts, total_time, level_frames):
+	def __init__(self, notice_text, fonts, total_time, level_frames):
+		filepath=''
 		super().__init__(filepath, fonts, total_time, level_frames=level_frames)
 		self.text_x_offset = 230
 		self.text_y_offset = 140
 		self.text_window_height = WINDOW_WIDTH - 450
 		self.text_window_width = WINDOW_HEIGHT * 0.55
+		self.text = notice_text
 
-		self.set_scene()
+		# self.set_scene()
 
 	def run(self, dt):
 		self.update_timers()
@@ -280,10 +299,10 @@ class EndScene(CutsceneLevel):
 		self.display_surface.blit(text_banner,banner_rect)
 
 		# write text 
-		# TODO handle if good ending or not --> call function instead
 		text_position = (230, 140)
 
-		text_surf = self.font.render(f'{self.text} and {self.total_time}', True, 'Black')
+		# TODO display end text nicely
+		text_surf = self.font.render(f'{self.text} and {self.total_time} > {self.coins} > {self.good_deeds}', True, 'Black')
 		text_rect = text_surf.get_rect(topleft = text_position, width=self.text_x_offset, height=self.text_y_offset)
 
 		self.display_surface.blit(text_surf, text_rect)

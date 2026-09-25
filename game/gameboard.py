@@ -14,22 +14,21 @@ class GameBoard:
         self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption(TITLE)
         self.import_assets()
-        self.story_mode = False
+        self.story_mode = True #False # TODO
 
-        # TODO tracks master data ie world timer, life timer and current level cap
         self.total_time = 120 # seconds. use one timer to beat all levels
         self.total_coins = 0
         self.total_good_deeds = 0
 
         self.platformer_tmx_maps = {
             1: load_pygame(join('.', 'assets', 'maps', 'levels', '0.tmx')),
-            2: load_pygame(join('.', 'assets', 'maps', 'levels', '0_1.tmx'))
+            2: load_pygame(join('.', 'assets', 'maps', 'levels', '1.tmx'))
         }
 
-        self.game_over_scene = EndScene(('config', 'end.json'), self.fonts, self.total_time, self.level_frames)
-        self.death_scene = EndScene(('config', 'end_death.json'), self.fonts, 0, self.level_frames)
+        self.game_over_scene = EndScene('GAME OVER',self.fonts, self.total_time, self.level_frames)
+        self.death_scene = EndScene('You did not complete the game... Try again?', self.fonts, 0, self.level_frames)
 
-        self.last_level = 3 # sorted(key for key in self.levels.keys())[-1]
+        self.last_level = 6 # TODO 
         self.level_index = 1
         self.current_stage = self._get_level(self.level_index)
 
@@ -41,19 +40,31 @@ class GameBoard:
         elif level_index == 2:
             return PlatformLevel(self.platformer_tmx_maps[1], self.level_frames, self.fonts, self.total_time)
 
-        elif level_index == 3:
-            return SpriteTalkingCutsceneLevel(('config', '1.json'), self.fonts, self.total_time,
-                                                      level_frames=self.level_frames)
+        if level_index == 3:
+            return SpriteTalkingCutsceneLevel(('config', '2.json'), self.fonts, self.total_time, level_frames=self.level_frames)
+
+        elif level_index == 4:
+            return PlatformLevel(self.platformer_tmx_maps[2], self.level_frames, self.fonts, self.total_time)
+
+        elif level_index == 5:
+            return SpriteTalkingCutsceneLevel(('config', 'end.json'), self.fonts, self.total_time, level_frames=self.level_frames)
+
+        elif level_index == 6:
+            # on the last scene, calculate whether show good or bad cutscene ending
+            end_scene_config = 'good_ending.json' if self.total_good_deeds >= 0 else 'bad_ending.json'
+            return SpriteTalkingCutsceneLevel(('config', end_scene_config), self.fonts, self.total_time,
+                                                                  level_frames=self.level_frames)
 
     def _set_current_stage(self, new_level):
         """whenever set current stage update game totals from the completed stage"""
-        self.total_good_deeds += self.current_stage.get_good_deeds()
+        self.total_good_deeds = self.current_stage.get_good_deeds()
         self.total_time = self.current_stage.get_time()
         self.total_coins = self.current_stage.get_coins()
 
         # if entering a platform level then set the coins and timer
         new_level.set_time(self.total_time)
         new_level.set_coins(self.total_coins)
+        new_level.good_deeds = self.total_good_deeds # TODO
 
         self.current_stage = new_level
 
@@ -92,6 +103,7 @@ class GameBoard:
         ui_frames = {
             'heart': import_folder('assets', 'imgs', 'graphics', 'ui', 'heart'), 
 			'coin': import_image('assets', 'imgs', 'graphics', 'ui', 'coin'),
+            'clock': import_folder('assets', 'imgs', 'graphics', 'ui', 'clock'),
             'sprites': {
                 'vampire': import_image('assets', 'imgs', 'graphics', 'sprites', 'vampire'),
                 'mirror': import_image('assets', 'imgs', 'graphics', 'sprites', 'mirror')
@@ -107,9 +119,11 @@ class GameBoard:
                 'sunset_scenery': import_image('assets', 'imgs',  'graphics', 'bg', 'imgs', 'sunset_scenery'),
                 'grave': import_image('assets', 'imgs',  'graphics', 'bg', 'imgs', 'grave'),
                 'beautiful_castle': import_image('assets', 'imgs',  'graphics', 'bg', 'imgs', 'beauitful_castle'),
+                'server': import_image('assets', 'imgs',  'graphics', 'bg', 'imgs', 'server'),
             },
             'animations': {
-                'light': import_folder('assets', 'imgs',  'graphics', 'bg', 'animations', 'light'),
+                'bright_light': import_folder('assets', 'imgs',  'graphics', 'bg', 'animations', 'light'),
+                'red_light': import_folder('assets', 'imgs',  'graphics', 'bg', 'animations', 'red_light'),
                 'explosion1': import_folder('assets', 'imgs',  'graphics', 'bg', 'animations', 'explosion', 'explosion1'),
                 'explosion2': import_folder('assets', 'imgs',  'graphics', 'bg', 'animations', 'explosion', 'explosion2'),
                 'fire': import_folder('assets', 'imgs',  'graphics', 'bg', 'animations', 'fire')

@@ -1,0 +1,26 @@
+{
+    "frame_0": {
+        "sprite_name": "",
+        "name": "vampire",
+        "bg": "black",
+        "animations": {
+        },
+        "text": "a small whispering voice: you do not need to murder to reach the end"
+    },
+    "frame_1": {
+        "sprite_name": "vampire",
+        "name": "vampire",
+        "bg": "black",
+        "animations": {
+        },
+        "text": "vampire: What? M.I.R.R.O.R., what did you say? Is there a human nearby? What was that sound?"
+    },
+    "frame_2": {
+        "sprite_name": "mirror",
+        "name": "vampire",
+        "bg": "black",
+        "animations": {
+        },
+        "text": "M.I.R.R.O.R.: Humans detected in current path."
+    }
+}

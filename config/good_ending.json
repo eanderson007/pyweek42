@@ -1,0 +1,44 @@
+{
+    "frame_0": {
+        "sprite_name": "",
+        "bg": "black",
+        "animations": {
+            "position": [440, 20],
+            "size": [350,350]
+        },
+        "text": "It is time."
+    },
+    "frame_1": {
+        "sprite_name": "vampire",
+        "bg": "black",
+        "animations": {
+            "bright_light": {
+                "position": [440, 20],
+                "size": [350,350]
+            }
+        },
+        "text": "vampire: I ... I ..."
+    },
+    "frame_2": {
+        "sprite_name": "vampire",
+        "bg": "black",
+        "animations": {
+            "fire": {
+                "position": [440, 20],
+                "size": [350,350]
+            }
+        },
+        "text": "I suppose it is true .. The most intense inferno is spared from us, except when we are made capable to behold it - to be decimated by seeing the self fully in the mirror."
+    },
+    "frame_3": {
+        "sprite_name": "",
+        "bg": "black",
+        "animations": {
+            "fire": {
+                "position": [440, 20],
+                "size": [350,350]
+            }
+        },
+        "text": "Come into the fire of my heart, and be like gold."
+    }
+}

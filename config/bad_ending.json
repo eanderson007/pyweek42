@@ -1,0 +1,47 @@
+{
+    "frame_0": {
+        "sprite_name": "vampire",
+        "bg": "black",
+        "animations": {},
+        "text": "vampire: ... today on Armageddon, I died ... and yet even at the end of my time, I still took from others..."
+    },
+    "frame_1": {
+        "sprite_name": "vampire",
+        "bg": "black",
+        "animations": {},
+        "text": "Why ... Why did I choose murder rather than face death? Borrowed time ... What did this debt give me but compounding wounds upon my soul?"
+    },
+    "frame_2": {
+        "sprite_name": "vampire",
+        "bg": "black",
+        "animations": {
+            "bright_light": {
+                "position": [440, 20],
+                "size": [350,350]
+            }
+        },
+        "text": "... there it is ... the-"
+    },
+    "frame_3": {
+        "sprite_name": "vampire",
+        "bg": "black",
+        "animations": {
+            "fire": {
+                "position": [440, 20],
+                "size": [350,350]
+            }
+        },
+        "text": "-Inferno! Take me, it is what I earned with my blood sucking life!"
+    },
+    "frame_4": {
+        "sprite_name": "",
+        "bg": "black",
+        "animations": {
+            "fire": {
+                "position": [440, 20],
+                "size": [350,350]
+            }
+        },
+        "text": "It was never what you earned. It has always been a gift."
+    }
+}

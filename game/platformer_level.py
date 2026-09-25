@@ -110,6 +110,11 @@ class PlatformLevel(Level):
 				else:
 					frames = self.particle_frames
 
+				# TODO if killed zombie/humans then that is a bad deed
+				if isinstance(target, Being) and target.name == 'zombie':
+					self.good_deeds -= 1
+					print('lost good deed')
+
 				kill_sprite_with_animation(target, frames, self.level_sprites)
 
 	def update_ui(self, dt):
@@ -130,16 +135,9 @@ class PlatformLevel(Level):
 		# if player past bottom border then level over
 		if self.player.hitbox_rect.bottom > self.level_bottom:
 			pass
-			# TODO should show lose/ win screen before returning
-			# self.switch_stage('overworld', -1)
-			# print('you lose')
 
-		# TODO put in own method
 		# success 
 		if self.player.hitbox_rect.colliderect(self.level_finish_rect):
-			# self.switch_stage('overworld', self.level_unlock)
-			print('you win')
-			# TODO show some kind of level complete rect??? until space bar or click??? rhen set complete
 			self.complete = True
 
 	def add_time(self):
@@ -358,7 +356,8 @@ class LevelSetup:
 					frames=self.level_frames[obj.name],
 					groups=[self.all_sprites, self.damage_sprites, self.being_sprites],
 					collision_sprites=self.collision_sprites,
-					blood_timer=RAT_TIME if obj.name == 'rat' else ZOMBIE_TIME
+					blood_timer=RAT_TIME if obj.name == 'rat' else ZOMBIE_TIME,
+					name = obj.name
 				)
 
 			if obj.name == 'shooter':

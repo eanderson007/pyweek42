@@ -36,7 +36,7 @@
         "sprite_name": "vampire",
         "bg": "black",
         "animation": ["light", "red_eyes"],
-        "text": "'Not ready to pay your debts? Perhaps would you like some borrowed time?'"
+        "text": "'Not ready to pay your debts? Perhaps, you would like some borrowed time?'"
     },
     "frame_5": {
         "sprite_name": "vampire",

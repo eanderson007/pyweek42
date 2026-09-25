@@ -2,28 +2,194 @@
     "frame_0": {
         "sprite_name": "vampire",
         "name": "vampire",
+        "bg": "grave",
+        "animations": {},
+        "text": "vampire: I died on September 17, 1816."
+    },
+    "frame_1": {
+        "sprite_name": "vampire",
+        "bg": "black",
+        "animations": {},
+        "text": "I was struck by a carriage and died on the street. It was cold. I was drunk."
+    },
+    "frame_2": {
+        "sprite_name": "vampire",
         "bg": "black",
         "animations": {
             "bright_light": {
                 "position": [440, 20],
                 "size": [350,350]
-            },
-            "explosions": [
-                    {"name" : "explosion1", "position": [350,300], "size": [200,200]},
-                    {"name" : "explosion2", "position": [0,0], "size": [400,400]}
-            ]
+            }
         },
-        "text": "vampire: I died on September 17, 1816."
+        "text": "I lay there in a street, yet at the same time I approached a light. It shone so bright and white hot it seared me."
     },
-    "frame_1": {
+    "frame_3": {
         "sprite_name": "vampire",
-        "name": "vampire",
+        "bg": "black",
+        "animations": {},
+        "text": "I turned away. I heard a voice ask:"
+    },    
+    "frame_4": {
+        "sprite_name": "vampire",
         "bg": "black",
         "animations": {
-            "fire": [
-                    {"position":[500,300], "size": [500,500]}
+            "red_light": {
+                "position": [440, 20],
+                "size": [350,350]
+            }
+        },
+        "text": "'Not ready to pay your debts? Perhaps, you would like some borrowed time?'"
+    },
+    "frame_5": {
+        "sprite_name": "vampire",
+        "bg": "black",
+        "animations": {},
+        "text": "That day I made a deal. I died, yet have remained, in this empty form, borrowing time from the blood of living beings."
+    },
+    "frame_6": {
+        "sprite_name": "vampire",
+        "bg": "sunset_scenery",
+        "animations": {
+            "explosions": [
+                    {"name" : "explosion1", "position": [350,300], "size": [130,125]},
+                    {"name" : "explosion2", "position": [0,0], "size": [200,195]},
+                    {"name" : "explosion1", "position": [350,120], "size": [80,95]},
+                    {"name" : "explosion2", "position": [600,180], "size": [110,105]},
+                    {"name" : "explosion1", "position": [780,40], "size": [210,200]}
             ]
         },
-        "text": "vampire: I died on September 17, 1816."
+        "text": "And by living on and on, I now stand here on the eve of the end of the world, with nothing but a machine to talk to.."
+    },
+    "frame_7": {
+        "sprite_name": "vampire",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "I can't bear to look at it, the world ending. I shall stay here, in my beautiful terrace of comfort."
+    },
+    "frame_8": {
+        "sprite_name": "mirror",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "M.I.R.R.O.R.: ... By the way, I am a supercomputer, not just a machine."
+    },
+    "frame_9": {
+        "sprite_name": "vampire",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "vampire: You are as lifeless as I. Yet you can know it not. Just a relic of past humankind, with only a devil like me to benefit from it all in these last days."
+    },
+    "frame_10": {
+        "sprite_name": "mirror",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "M.I.R.R.O.R.: Calculating what will happen first, you die or the world ends-"
+    },
+    "frame_11": {
+        "sprite_name": "vampire",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "vampire: Funny."
+    },
+    "frame_12": {
+        "sprite_name": "mirror",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "M.I.R.R.O.R.: Estimated 5 minutes before the end of the world. Calculating your time before death..."
+    },
+    "frame_13": {
+        "sprite_name": "vampire",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "vampire: I am as dead at this moment. There are hardly any animals left, just rats, and even fewer humans. I must have blood to survive."
+    },
+    "frame_14": {
+        "sprite_name": "vampire",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "..."
+    },
+    "frame_15": {
+        "sprite_name": "vampire",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "What has it all been for? Why am I here? Does any of it matter? What am I even asking- I mean - I mean - what is the meaning of what I should be asking?"
+    },
+    "frame_16": {
+        "sprite_name": "vampire",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "M.I.R.R.O.R. - you are the culmination of all that mankind built in its glory, surely your calculations shall yield the answer!"
+    },
+    "frame_17": {
+        "sprite_name": "vampire",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "Answer me why- what-, answer I beg of you!"
+    },
+    "frame_18": {
+        "sprite_name": "mirror",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "M.I.R.R.O.R.: ..."
+    },
+    "frame_19": {
+        "sprite_name": "mirror",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "Cannot calculate your request. "
+    },
+    "frame_20": {
+        "sprite_name": "vampire",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "vampire: !!!"
+    },
+    "frame_21": {
+        "sprite_name": "mirror",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "M.I.R.R.O.R.: Request overloading current interface. you can try again asking by the command line at the servers in the lowest castle dungeon."
+    },
+    "frame_22": {
+        "sprite_name": "vampire",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "vampire: But we are on the top floor! Can I even get there before drying, or the world ending!?"
+    },
+    "frame_23": {
+        "sprite_name": "vampire",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "M.I.R.R.O.R., calculate what life forms remain on Earth and estimate their blood time ratio!"
+    },
+    "frame_24": {
+        "sprite_name": "mirror",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "M.I.R.R.O.R.: As per your requests over the centuries, all blood bearing forms have been relocated to within the castle."
+    },
+    "frame_25": {
+        "sprite_name": "mirror",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "Remaining blood bearing forms include rats and humans. If you move quickly, you can reach the servers by feeding on the life forms you find on your path to the servers."
+    },
+    "frame_26": {
+        "sprite_name": "mirror",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "If you reach the servers before dying of lack of blood, you will be able to execute your request before the world ends."
+    },
+    "frame_27": {
+        "sprite_name": "vampire",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "vampire: ... okay ... I shall see you 'down below', M.I.R.R.O.R."
+    },
+    "frame_28": {
+        "sprite_name": "mirror",
+        "bg": "beautiful_castle",
+        "animations": {},
+        "text": "M.I.R.R.O.R.: You must also watch out for my 'immune system' - you are too weak to defeat my technical defences, so avoid them if you can."
     }
 }

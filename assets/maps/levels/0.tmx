@@ -276,11 +276,6 @@
  </objectgroup>
  <objectgroup id="7" name="Enemies">
   <object id="42" name="rat" gid="33" x="791.865" y="768.877" width="32" height="32"/>
-  <object id="43" name="shooter" x="81.4681" y="617.791" width="18.1721" height="17.6376">
-   <properties>
-    <property name="reverse" type="bool" value="true"/>
-   </properties>
-  </object>
   <object id="44" name="zombie" gid="44" x="2317.22" y="865.226" width="32" height="32"/>
  </objectgroup>
  <layer id="5" name="Platforms" width="120" height="30">
@@ -359,7 +354,7 @@
     <property name="death_border_bottom" type="int" value="0"/>
     <property name="horizon_line" type="int" value="600"/>
     <property name="level_unlock" type="int" value="1"/>
-    <property name="top_limit" type="int" value="100"/>
+    <property name="top_limit" type="int" value="0"/>
    </properties>
   </object>
  </objectgroup>

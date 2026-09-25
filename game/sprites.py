@@ -159,7 +159,7 @@ class PlaceholderSprite(sprite.Sprite):
 			super().__init__([])
 			self.rect = Rect()
 			self.last_rect = self.rect.copy()
-			self.z_layer = 1
+			self.z_layer = 0
 
 	def set_rect_custom(self, rect):
 		self.rect = rect

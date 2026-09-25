@@ -251,7 +251,7 @@ class LevelSetup:
 		map_pixel_width = tmx_map.width * TILE_SIZE
 		map_pixel_height = tmx_map.height * TILE_SIZE
 
-		for layer_name in ['Terrain', 'BG', 'FG', 'Platforms']:
+		for layer_name in ['BG', 'Terrain', 'FG', 'Platforms']:
 			try:
 				layer = tmx_map.get_layer_by_name(layer_name)
 			except ValueError:
@@ -278,21 +278,6 @@ class LevelSetup:
 						self.collision_sprites.add(collision_dummy)
 					elif layer_name == 'Platforms':
 						self.semi_collison_sprites.add(collision_dummy)
-
-	# def __setup_tiles(self, tmx_map):
-	# 	for layer in ['Terrain', 'BG', 'FG', 'Platforms']:
-	# 		for x, y, surf in tmx_map.get_layer_by_name(layer).tiles():
-	# 			groups = [self.all_sprites]
-
-	# 			if layer == 'Terrain': groups.append(self.collision_sprites)
-	# 			if layer == 'Platforms': groups.append(self.semi_collison_sprites)
-
-	# 			match layer:
-	# 				case 'BG': z = Z_LAYERS['bg tiles']
-	# 				case 'FG': z = Z_LAYERS['bg tiles']
-	# 				case _: z = Z_LAYERS['main']
-
-	# 			Sprite((x * TILE_SIZE,y * TILE_SIZE), surf, groups, z_layer=z)
 
 	def __setup_player(self, tmx_map):
 		for obj in tmx_map.get_layer_by_name('Objects'):

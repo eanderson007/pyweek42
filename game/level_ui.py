@@ -23,6 +23,22 @@ class LevelUI:
 		self.coin_amount = 0
 		self.coin_timer = Timer(1000)
 
+		self.static_labels = []
+		for text, pos in {
+			'Coins:': (45, 39), 'Health:': (190, 39), 'Seconds to Blood Loss Death:': (55, 68)
+		}.items():
+			surf = self.font.render(text, False, '#33323d')
+			rect = surf.get_frect(topleft=pos)
+			self.static_labels.append((surf, rect))
+
+		self._cached_coin_amount = -1
+		self._cached_coin_surf = None
+		self._cached_coin_rect = None
+
+		self._cached_time_seconds = -1
+		self._cached_time_surf = None
+		self._cached_time_rect = None
+
 		# frame for player data
 		self.banner_surf = self.frames['banners']['roll']
 		self.banner_rect =  self.banner_surf.get_frect(topleft = (0,0))
@@ -54,12 +70,8 @@ class LevelUI:
 	def display_data_header(self):
 		self.display_surface.blit(self.banner_surf, self.banner_rect)
 
-		for text, pos in {
-			'Coins:': (45, 39), 'Health:': (190, 39), 'Seconds to Blood Loss Death:': (55, 68)
-					}.items():
-			text_surf = self.font.render(text, False, '#33323d')
-			text_rect = text_surf.get_frect(topleft = pos)
-			self.display_surface.blit(text_surf, text_rect)
+		for surf, rect in self.static_labels:
+			self.display_surface.blit(surf, rect)
 
 	def create_hearts(self, amount):
 		if amount != len(self.sprites):
@@ -69,11 +81,6 @@ class LevelUI:
 				x = 270 + heart * (self.heart_surf_width + self.heart_padding)
 				y = 42
 				Heart((x,y), self.heart_frames, self.sprites)
-
-	def display_text(self, text, position):
-		text_surf = self.font.render(text, False, '#33323d')
-		text_rect = text_surf.get_frect(topleft = position)
-		self.display_surface.blit(text_surf, text_rect)
 
 	def update_coins(self, amount):
 		self.coin_amount = amount
@@ -94,8 +101,19 @@ class LevelUI:
 
 		# draw the data banner
 		self.display_data_header()
-		self.display_text(str(self.coin_amount), (106, 39))
-		self.display_text(f'{self.time_seconds}', (self.banner_surf.width/2, 95))
+		
+		# Only render dynamic text when the actual numerical value changes
+		if self.coin_amount != self._cached_coin_amount:
+			self._cached_coin_amount = self.coin_amount
+			self._cached_coin_surf = self.font.render(str(self.coin_amount), False, '#33323d')
+			self._cached_coin_rect = self._cached_coin_surf.get_frect(topleft=(106, 39))
+		self.display_surface.blit(self._cached_coin_surf, self._cached_coin_rect)
+
+		if self.time_seconds != self._cached_time_seconds:
+			self._cached_time_seconds = self.time_seconds
+			self._cached_time_surf = self.font.render(str(self.time_seconds), False, '#33323d')
+			self._cached_time_rect = self._cached_time_surf.get_frect(topleft=(self.banner_surf.width/2, 95))
+		self.display_surface.blit(self._cached_time_surf, self._cached_time_rect)
 
 		# draw the hearts
 		self.sprites.draw(self.display_surface)

@@ -62,7 +62,8 @@ class AllSprites(pygame.sprite.Group):
 		blit = self.display_surface.blit
 
         # Step through pre-sorted Z-layer buckets
-		for z in sorted(self.z_layers.keys()):
+		# print(self.z_layers.keys())
+		for z in sorted(self.z_layers.keys(), key=lambda layer_val: int(layer_val) if str(layer_val).isdigit() or isinstance(layer_val, (int, float)) else 0):
 			for sprite in self.z_layers[z]:
 				rect = sprite.rect
                 

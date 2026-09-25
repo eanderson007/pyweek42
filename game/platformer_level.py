@@ -302,8 +302,7 @@ class LevelSetup:
 				frames = self.level_frames[obj.name]
 				groups = [self.all_sprites]
 				z = Z_LAYERS['main'] if not 'bg' in obj.name else Z_LAYERS['bg details']
-				animation_speed = ANIMATION_SPEED 
-				AnimatedSprite((obj.x, obj.y), frames, groups, z_layer=z, animation_speed=animation_speed)
+				AnimatedSprite((obj.x, obj.y), frames, groups, z_layer=z, animation_speed=ANIMATION_SPEED)
 
 			# to track the end of the level
 			elif obj.name == 'flag':

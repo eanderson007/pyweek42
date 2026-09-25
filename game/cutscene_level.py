@@ -9,7 +9,6 @@ from .timer import Timer
 from .sprites import AnimatedSprite
 from random import choice
 
-
 class CutsceneLevel(Level):
 	def __init__(self, filepath, fonts, total_time, level_frames=None, bg_img_name = None):
 		super().__init__(total_time)
@@ -303,7 +302,7 @@ class SpriteTalkingCutsceneLevel(CutsceneLevel):
 		
 
 class EndScene(CutsceneLevel):
-	def __init__(self, notice_text, fonts, total_time, level_frames):
+	def __init__(self, notice_text, fonts, total_time, level_frames, is_death_scene=False):
 		filepath=''
 		super().__init__(filepath, fonts, total_time, level_frames=level_frames)
 		self.text_x_offset = 230
@@ -312,26 +311,64 @@ class EndScene(CutsceneLevel):
 		self.text_window_width = WINDOW_HEIGHT * 0.55
 		self.text = notice_text
 
-		# self.set_scene()
+		self.is_death_ending = is_death_scene
+
+		# cache the banner
+		self.banner_position = (100,70)
+		self.text_position = (230, 140)
+
+		text_banner = self.level_frames['level_ui']['banners']['large_roll']
+		self.text_banner = pygame.transform.scale(text_banner, (WINDOW_WIDTH - 200, (WINDOW_HEIGHT * 0.75)))
+		self.banner_rect = text_banner.get_rect(topleft = self.banner_position)
+
+		# get all the text to display
+		self.y_line_offset = 50
+		self.text_items = {}
+
+	def get_coin_level(self):
+		success_level = 'Beginner'
+		if self.coins >= .4 * COIN_TOTAL:
+			success_level = 'Apprentice'
+
+		elif self.coins >= .65 * COIN_TOTAL:
+			success_level = 'Well Practiced'
+
+		elif self.coins >= .8 * COIN_TOTAL:
+			success_level = 'Experienced'
+
+		elif self.coins >= .94 * COIN_TOTAL:
+			success_level = 'Master'
+
+		elif self.coins == 0:
+			success_level = 'Skunk'
+
+		return success_level
 
 	def run(self, dt):
 		self.update_timers()
 		self.display()
 
 	def display(self):
-		# load large scroll
-		banner_position = (100,70)
-		text_banner = self.level_frames['level_ui']['banners']['large_roll']
-		text_banner = pygame.transform.scale(text_banner, (WINDOW_WIDTH - 200, (WINDOW_HEIGHT * 0.75)))
-		banner_rect = text_banner.get_rect(topleft = banner_position)
-		self.display_surface.blit(text_banner,banner_rect)
+		blit = self.display_surface.blit
 
-		# write text 
-		text_position = (230, 140)
+		blit(self.text_banner, self.banner_rect)
 
-		# TODO display end text nicely
-		text_surf = self.font.render(f'{self.text} and {self.total_time} > {self.coins} > {self.good_deeds}', True, 'Black')
-		text_rect = text_surf.get_rect(topleft = text_position, width=self.text_x_offset, height=self.text_y_offset)
+		text_to_display = {
+			self.text: self.text_position,
+			f'Time Remaining: {self.total_time}': [self.text_position[0], self.text_position[1] + 80],
+			f'Coins Collected: {self.coins}': [self.text_position[0], self.text_position[1] + 80 + (1 * self.y_line_offset)],
+			f'Thank you very much for playing!': [self.text_position[0] + 105, self.text_position[1] + 80 + (5 * self.y_line_offset)]
+		}
 
-		self.display_surface.blit(text_surf, text_rect)
+		# only show coin success level if beat the game
+		if not self.is_death_ending:
+			line = f'Coin Level: {self.get_coin_level()}'
+			text_to_display[line] = [self.text_position[0], self.text_position[1] + 80 + (2 * self.y_line_offset)]
+
+		for line, pos in text_to_display.items():
+			
+			text_surf = self.font.render(line, True, 'Black')
+			text_rect = text_surf.get_rect(topleft = pos, width=self.text_x_offset, height=self.text_y_offset)
+			
+			blit(text_surf, text_rect)
 

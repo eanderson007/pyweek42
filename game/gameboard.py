@@ -9,14 +9,20 @@ from settings import *
 
 
 class GameBoard:
+
+    def set_display(self):
+        self.display_surface = pygame.display.set_mode((self.width, self.height))
     
     def __init__(self):
-        self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+        self.width = WINDOW_WIDTH
+        self.height = WINDOW_HEIGHT
+        self.set_display()
+
         pygame.display.set_caption(TITLE)
         self.import_assets()
-        self.story_mode = True #False # TODO
+        self.story_mode = False
 
-        self.total_time = 120 # seconds. use one timer to beat all levels
+        self.total_time = TOTAL_GAME_TIME # seconds. use one timer to beat all levels
         self.total_coins = 0
         self.total_good_deeds = 0
 
@@ -26,9 +32,9 @@ class GameBoard:
         }
 
         self.game_over_scene = EndScene('GAME OVER',self.fonts, self.total_time, self.level_frames)
-        self.death_scene = EndScene('You did not complete the game... Try again?', self.fonts, 0, self.level_frames)
+        self.death_scene = EndScene('You did not complete the game... Try again?', self.fonts, 0, self.level_frames, is_death_scene=True)
 
-        self.last_level = 6 # TODO 
+        self.last_level = 6  
         self.level_index = 1
         self.current_stage = self._get_level(self.level_index)
 
@@ -64,12 +70,11 @@ class GameBoard:
         # if entering a platform level then set the coins and timer
         new_level.set_time(self.total_time)
         new_level.set_coins(self.total_coins)
-        new_level.good_deeds = self.total_good_deeds # TODO
+        new_level.good_deeds = self.total_good_deeds
 
         self.current_stage = new_level
 
     def update_scene(self):
-    
         # if player died in stage then move to death screen
         if self.current_stage.death == True:
             if self.story_mode:
@@ -158,7 +163,7 @@ class GameBoard:
 
             # enemy animations
             'rat': import_folder('assets', 'imgs', 'graphics', 'beings', 'rat'),
-            'zombie': import_folder('assets', 'imgs', 'graphics', 'beings', 'zombie'), # TODO person instead
+            'zombie': import_folder('assets', 'imgs', 'graphics', 'beings', 'zombie'), 
 
             'shooter': import_sub_folders('assets', 'imgs', 'graphics','beings', 'shooter'),
 			'bullet': import_image('assets', 'imgs',  'graphics', 'beings', 'bullets', 'bullet'), 

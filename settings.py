@@ -31,15 +31,26 @@ HIT_TIME = 1000
 BUTTON_BLOCK = 500
 POTION_TIMER = 15 # TODO
 
+# silver = 1, diamon = 20, gold = 5
 LEVEL_STATS = {
     1: {
-        'coins': 10,
-        'seconds': 60
+        'silver': 10, 
+        'diamond': 3, 
+        'gold': 8, 
+        'total': 110,
+        'seconds': 80 # TODO
 	},
     2: {
+        'silver': 19, 
+		'diamond': 8,
+		'gold': 5,
+        'total': 204,
+		'seconds': 120 # TODO
         
 	},
     3: {
         
 	}
 }
+COIN_TOTAL = 110 + 204
+TOTAL_GAME_TIME = 80 + 120

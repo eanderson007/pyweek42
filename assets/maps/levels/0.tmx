@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="120" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="110">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="120" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="112">
  <tileset firstgid="1" source="../tilesets/castle.tsx"/>
  <tileset firstgid="33" source="../tilesets/creatures1.tsx"/>
  <tileset firstgid="66" source="../tilesets/items.tsx"/>
@@ -245,6 +245,20 @@
     <property name="flip" type="bool" value="true"/>
     <property name="platform" type="bool" value="false"/>
     <property name="speed" type="int" value="20"/>
+   </properties>
+  </object>
+  <object id="110" name="helicoptor" x="2448.84" y="503.762" width="5.96026" height="161.589">
+   <properties>
+    <property name="flip" type="bool" value="false"/>
+    <property name="platform" type="bool" value="true"/>
+    <property name="speed" type="int" value="60"/>
+   </properties>
+  </object>
+  <object id="111" name="helicoptor" x="2349.29" y="289.34" width="5.96026" height="161.589">
+   <properties>
+    <property name="flip" type="bool" value="false"/>
+    <property name="platform" type="bool" value="true"/>
+    <property name="speed" type="int" value="60"/>
    </properties>
   </object>
  </objectgroup>

@@ -44,13 +44,13 @@ class GameBoard:
                                           level_frames=self.level_frames)
 
         elif level_index == 2:
-            return PlatformLevel(self.platformer_tmx_maps[1], self.level_frames, self.fonts, self.total_time)
+            return PlatformLevel(self.platformer_tmx_maps[1], self.level_frames, self.fonts, self.total_time, self.audio_files)
 
         if level_index == 3:
             return SpriteTalkingCutsceneLevel(('config', '2.json'), self.fonts, self.total_time, level_frames=self.level_frames)
 
         elif level_index == 4:
-            return PlatformLevel(self.platformer_tmx_maps[2], self.level_frames, self.fonts, self.total_time)
+            return PlatformLevel(self.platformer_tmx_maps[2], self.level_frames, self.fonts, self.total_time, self.audio_files)
 
         elif level_index == 5:
             return SpriteTalkingCutsceneLevel(('config', 'end.json'), self.fonts, self.total_time, level_frames=self.level_frames)
@@ -183,5 +183,13 @@ class GameBoard:
             'text1': pygame.font.Font(join('assets', 'fonts', 'digital_gothic.ttf'), 41),
             'small_text1':pygame.font.Font(join('assets', 'fonts', 'digital_gothic.ttf'), 22),
         }
+
+        self.audio_files = {
+			'coin': pygame.mixer.Sound(join('assets', 'music', 'sound_effects', 'coin.wav')),
+			'attack': pygame.mixer.Sound(join('assets', 'music', 'sound_effects', 'attack.wav')),
+			'jump': pygame.mixer.Sound(join('assets', 'music', 'sound_effects', 'jump.wav')), 
+			'damage': pygame.mixer.Sound(join('assets', 'music', 'sound_effects', 'damage.wav')),
+			'bullet': pygame.mixer.Sound(join('assets', 'music', 'sound_effects', 'bullet.wav')),
+		}
 
 		

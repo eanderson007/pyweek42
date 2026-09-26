@@ -24,6 +24,7 @@ ____________________________________________________________
 Thank you to various artists / sources for free assets used in this project
 
 
+https://www.classicals.de/licensing
 https://studio-schneeya.itch.io/vampire-castle-asset-pack
 https://indie-vova.itch.io/dungeons-and-pixels-starter-pack
 https://craftpix.net/freebies/free-vampire-4-direction-pixel-character-sprite-pack/?srsltid=AU7gw4Vt7OMXc2XAAVtMwOuM0qY7uOtblAtIPhRBgl7Q7PU_wwNms_xR

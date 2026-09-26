@@ -39,7 +39,8 @@ class PlayerState(Enum):
 	GAME_OVER = 'death'
 
 class Player(pygame.sprite.Sprite):
-	def __init__(self, pos, groups, collision_sprites, semi_collision_sprites, surf, frames):
+	def __init__(self, pos, groups, collision_sprites, semi_collision_sprites, surf, frames,
+	             attack_sound=None, jump_sound=None):
 		super().__init__(groups)
 		self.z_layer = Z_LAYERS['main']
 		self.data = Data()
@@ -81,6 +82,12 @@ class Player(pygame.sprite.Sprite):
 			TimerType.INIT_JUMP_BLOCK: Timer(50),
 			TimerType.HIT: Timer(HIT_TIME)
         }
+
+		# audio 
+		self.attack_sound = attack_sound
+		self.attack_sound.set_volume(0.3)
+		self.jump_sound = jump_sound
+		self.jump_sound.set_volume(0.1)
 	
 	def input(self):
 		keys = pygame.key.get_pressed()
@@ -111,6 +118,7 @@ class Player(pygame.sprite.Sprite):
 			self.attacking = True
 			self.frame_index = 0
 			self.timers[TimerType.ATTACK_BLOCK].activate()
+			self.attack_sound.play()
 	
 	def collision(self, axis):
 		for sprite in self.collision_sprites:
@@ -204,11 +212,13 @@ class Player(pygame.sprite.Sprite):
 				self.timers[TimerType.WALL_SLIDE_BLOCK].activate()
 				self.timers[TimerType.INIT_JUMP_BLOCK].activate()
 				self.hitbox_rect.bottom -= 1
+				self.jump_sound.play()
 			
 			elif any((self.active_surface[ActiveSurface.LEFT], self.active_surface[ActiveSurface.RIGHT])) and not self.timers[TimerType.WALL_SLIDE_BLOCK].active:
 					self.timers[TimerType.WALL_JUMP].activate()
 					self.direction.y = -JUMP
 					self.direction.x = 1 if self.active_surface[ActiveSurface.LEFT] else -1
+					self.jump_sound.play()
 			
 			self.jump = False
 

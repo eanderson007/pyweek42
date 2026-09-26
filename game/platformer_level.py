@@ -13,7 +13,7 @@ from .timer import Timer
 
 
 class PlatformLevel(Level):
-	def __init__(self, tmx_map, level_frames, fonts, total_time):
+	def __init__(self, tmx_map, level_frames, fonts, total_time, audio_files):
 		super().__init__(total_time)
 		self.display_surface = pygame.display.get_surface()
 		self.level_frames = level_frames
@@ -51,12 +51,19 @@ class PlatformLevel(Level):
 		self.bullet_sprites = pygame.sprite.Group()
 		self.item_sprites = pygame.sprite.Group()
 
+		# audio
+		self.audio_files = audio_files
+		self.coin_sound = audio_files['coin']
+		self.coin_sound.set_volume(0.3)
+		self.damage_sound = audio_files['damage']
+		self.damage_sound.set_volume(0.3)
+
 		self.setup(tmx_map)
 	
 	def setup(self, tmx_map):
 		setup = LevelSetup(tmx_map, self.level_frames, self.level_sprites, self.collision_sprites,
 									self.semi_collision_sprites, self.being_sprites, self.bullet_sprites, 
-									self.item_sprites, self.damage_sprites)
+									self.item_sprites, self.damage_sprites, self.audio_files)
 		
 		self.player = setup.get_player()
 		self.level_finish_rect = setup.get_level_complete_rect()
@@ -81,6 +88,7 @@ class PlatformLevel(Level):
 		for sprite in self.damage_sprites:
 			if sprite.rect.colliderect(self.player.hitbox_rect) and not self.player.attacking:
 				self.player.update_damage()
+				self.damage_sound.play()
 				if hasattr(sprite, 'bullet'):
 					kill_sprite_with_animation(sprite, self.particle_frames, self.level_sprites)
 
@@ -98,6 +106,7 @@ class PlatformLevel(Level):
 						frames = self.particle_frames
 
 					kill_sprite_with_animation(sprite, frames, self.level_sprites)
+					self.coin_sound.play() # later: add blood sound 
 
 	def check_attack_collision(self, target_sprites):
 		for target in target_sprites:
@@ -216,10 +225,12 @@ def kill_sprite_with_animation(sprite, particle_frames, all_sprites_group):
 
 class LevelSetup:
 	def __init__(self, tmx_map, level_frames, all_sprites, collision_sprites, semi_collison_sprites, 
-			  being_sprites, bullet_sprites, item_sprites, damage_sprites):
+			  being_sprites, bullet_sprites, item_sprites, damage_sprites, audio):
 		self.level_frames = level_frames
 		# specific frames
 		self.bullet_surf = level_frames['bullet']
+		self.audio = audio
+		self.bullet_sound = audio['bullet']
 
 		self.all_sprites = all_sprites
 		self.collision_sprites = collision_sprites
@@ -229,13 +240,14 @@ class LevelSetup:
 		self.bullet_sprites = bullet_sprites
 		self.item_sprites = item_sprites
 		self.damage_sprites = damage_sprites
-
+	
 		self.player = None
 
 		self.setup(tmx_map)
 
 	def create_bullet(self, pos, direction):
 		Bullet(pos, (self.all_sprites, self.damage_sprites, self.bullet_sprites), self.bullet_surf, direction, 150)
+		self.bullet_sound.play()
 
 	def setup(self, tmx_map):
 		self.__setup_tiles(tmx_map)
@@ -288,7 +300,9 @@ class LevelSetup:
 					collision_sprites=self.collision_sprites, 
 					semi_collision_sprites=self.semi_collison_sprites, 
 					surf=obj.image,
-					frames= self.level_frames['player']
+					frames= self.level_frames['player'],
+					attack_sound = self.audio['attack'],
+					jump_sound = self.audio['jump']
 					)
 
 	def __setup_static_objects(self, tmx_map):

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="120" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="109">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="120" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="110">
  <tileset firstgid="1" source="../tilesets/castle.tsx"/>
  <tileset firstgid="33" source="../tilesets/creatures1.tsx"/>
  <tileset firstgid="66" source="../tilesets/items.tsx"/>
@@ -276,6 +276,7 @@
  </objectgroup>
  <objectgroup id="7" name="Enemies">
   <object id="42" name="rat" gid="33" x="791.865" y="768.877" width="32" height="32"/>
+  <object id="109" name="rat" gid="33" x="530.19" y="449.722" width="32" height="32"/>
  </objectgroup>
  <layer id="5" name="Platforms" width="120" height="30">
   <data encoding="csv">

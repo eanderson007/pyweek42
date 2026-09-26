@@ -136,7 +136,7 @@
         "sprite_name": "mirror",
         "bg": "beautiful_castle",
         "animations": {},
-        "text": "Cannot calculate your request. "
+        "text": "Error calculating your request. "
     },
     "frame_20": {
         "sprite_name": "vampire",
@@ -154,7 +154,7 @@
         "sprite_name": "vampire",
         "bg": "beautiful_castle",
         "animations": {},
-        "text": "vampire: But we are on the top floor! Can I even get there before drying, or the world ending!?"
+        "text": "vampire: But we are on the top floor! Can I even get there before dying, or the world ending!?"
     },
     "frame_23": {
         "sprite_name": "vampire",
